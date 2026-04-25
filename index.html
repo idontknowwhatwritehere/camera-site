@@ -7,9 +7,7 @@
 <title>Сравнение яркости</title>
 
 <style>
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
 
   body {
     margin: 0;
@@ -20,6 +18,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
   }
 
   .app {
@@ -32,7 +31,6 @@
   h1 {
     margin: 0 0 14px;
     font-size: 26px;
-    font-weight: 700;
   }
 
   .top-text {
@@ -50,6 +48,7 @@
     background: #111;
     box-shadow: 0 20px 50px rgba(0,0,0,.6);
     border: 2px solid rgba(255,255,255,.12);
+    touch-action: none;
   }
 
   video,
@@ -71,18 +70,12 @@
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 8px 25px rgba(0,255,170,.35);
-  }
-
-  button:active {
-    transform: scale(.97);
   }
 
   .result {
     margin-top: 22px;
     font-size: 24px;
     font-weight: 800;
-    letter-spacing: .4px;
   }
 
   .bottom-text {
@@ -100,22 +93,20 @@
   <h1>Сравнение яркости</h1>
 
   <div class="top-text">
-    Наведите камеру на объект и сравните две вертикальные области
+    Двигайте линии пальцем. Горизонтально — каждую отдельно, вертикально — обе сразу.
   </div>
 
-  <div class="camera-box">
+  <div class="camera-box" id="cameraBox">
     <video id="video" autoplay playsinline muted></video>
     <canvas id="overlay"></canvas>
   </div>
 
   <button id="startBtn">Открыть камеру</button>
 
-  <div class="result" id="result">
-    Камера не открыта
-  </div>
+  <div class="result" id="result">Камера не открыта</div>
 
   <div class="bottom-text">
-    Показывается, на сколько процентов одна линия ярче второй
+    Более тёмная линия меняет цвет
   </div>
 
 </div>
@@ -126,23 +117,28 @@ const canvas = document.getElementById("overlay");
 const ctx = canvas.getContext("2d");
 const result = document.getElementById("result");
 const startBtn = document.getElementById("startBtn");
+const cameraBox = document.getElementById("cameraBox");
 
 const hiddenCanvas = document.createElement("canvas");
 const hiddenCtx = hiddenCanvas.getContext("2d");
 
+let cameraStarted = false;
+
 const lines = [
-  { x: 38, y1: 25, y2: 75 },
-  { x: 62, y1: 25, y2: 75 }
+  { x: 38 },
+  { x: 62 }
 ];
 
-let cameraStarted = false;
+let lineY1 = 25;
+let lineY2 = 75;
+
+let activeLine = null;
+let isResizingVertical = false;
 
 startBtn.addEventListener("click", async () => {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: "environment" }
-      },
+      video: { facingMode: { ideal: "environment" } },
       audio: false
     });
 
@@ -161,6 +157,65 @@ startBtn.addEventListener("click", async () => {
   }
 });
 
+cameraBox.addEventListener("pointerdown", e => {
+  const pos = getPointerPercent(e);
+
+  const distanceToLeft = Math.abs(pos.x - lines[0].x);
+  const distanceToRight = Math.abs(pos.x - lines[1].x);
+
+  const distanceToTop = Math.abs(pos.y - lineY1);
+  const distanceToBottom = Math.abs(pos.y - lineY2);
+
+  if (distanceToTop < 8 || distanceToBottom < 8) {
+    isResizingVertical = true;
+    activeLine = null;
+  } else {
+    activeLine = distanceToLeft < distanceToRight ? 0 : 1;
+    isResizingVertical = false;
+  }
+
+  cameraBox.setPointerCapture(e.pointerId);
+});
+
+cameraBox.addEventListener("pointermove", e => {
+  if (activeLine === null && !isResizingVertical) return;
+
+  const pos = getPointerPercent(e);
+
+  if (isResizingVertical) {
+    const center = (lineY1 + lineY2) / 2;
+    let halfSize = Math.abs(pos.y - center);
+
+    halfSize = clamp(halfSize, 10, 45);
+
+    lineY1 = center - halfSize;
+    lineY2 = center + halfSize;
+  } else {
+    lines[activeLine].x = clamp(pos.x, 8, 92);
+  }
+});
+
+cameraBox.addEventListener("pointerup", stopDrag);
+cameraBox.addEventListener("pointercancel", stopDrag);
+
+function stopDrag() {
+  activeLine = null;
+  isResizingVertical = false;
+}
+
+function getPointerPercent(e) {
+  const rect = cameraBox.getBoundingClientRect();
+
+  return {
+    x: ((e.clientX - rect.left) / rect.width) * 100,
+    y: ((e.clientY - rect.top) / rect.height) * 100
+  };
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
 function resizeCanvas() {
   const box = canvas.getBoundingClientRect();
 
@@ -176,8 +231,8 @@ function getBrightness(line) {
   const h = hiddenCanvas.height;
 
   const x = Math.round(line.x / 100 * w);
-  const y1 = line.y1 / 100 * h;
-  const y2 = line.y2 / 100 * h;
+  const y1 = lineY1 / 100 * h;
+  const y2 = lineY2 / 100 * h;
 
   const steps = 120;
   let total = 0;
@@ -188,32 +243,41 @@ function getBrightness(line) {
 
     const pixel = hiddenCtx.getImageData(x, y, 1, 1).data;
 
-    const r = pixel[0];
-    const g = pixel[1];
-    const b = pixel[2];
-
-    total += 0.299 * r + 0.587 * g + 0.114 * b;
+    total += 0.299 * pixel[0] + 0.587 * pixel[1] + 0.114 * pixel[2];
   }
 
   return total / steps;
 }
 
-function drawLine(line) {
+function drawLine(line, isDarker) {
   const w = canvas.width;
   const h = canvas.height;
 
   const x = line.x / 100 * w;
-  const y1 = line.y1 / 100 * h;
-  const y2 = line.y2 / 100 * h;
+  const y1 = lineY1 / 100 * h;
+  const y2 = lineY2 / 100 * h;
 
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 7;
   ctx.lineCap = "round";
-  ctx.strokeStyle = "rgba(0, 255, 150, .95)";
+
+  ctx.strokeStyle = isDarker
+    ? "rgba(255, 70, 70, 0.65)"
+    : "rgba(0, 255, 150, 0.55)";
 
   ctx.beginPath();
   ctx.moveTo(x, y1);
   ctx.lineTo(x, y2);
   ctx.stroke();
+
+  ctx.fillStyle = "rgba(255,255,255,0.75)";
+
+  ctx.beginPath();
+  ctx.arc(x, y1, 8, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(x, y2, 8, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 function loop() {
@@ -222,37 +286,26 @@ function loop() {
   if (video.videoWidth && video.videoHeight) {
     resizeCanvas();
 
-    hiddenCtx.drawImage(
-      video,
-      0,
-      0,
-      hiddenCanvas.width,
-      hiddenCanvas.height
-    );
-
+    hiddenCtx.drawImage(video, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    drawLine(lines[0]);
-    drawLine(lines[1]);
 
     const brightness1 = getBrightness(lines[0]);
     const brightness2 = getBrightness(lines[1]);
 
+    drawLine(lines[0], brightness1 < brightness2);
+    drawLine(lines[1], brightness2 < brightness1);
+
     const max = Math.max(brightness1, brightness2);
     const min = Math.min(brightness1, brightness2);
 
-    let percent = 0;
-
-    if (min > 0) {
-      percent = ((max - min) / min) * 100;
-    }
+    let percent = min > 0 ? ((max - min) / min) * 100 : 0;
 
     if (brightness1 > brightness2) {
       result.textContent = `Левая ярче на ${percent.toFixed(1)}%`;
     } else if (brightness2 > brightness1) {
       result.textContent = `Правая ярче на ${percent.toFixed(1)}%`;
     } else {
-      result.textContent = `Яркость одинаковая`;
+      result.textContent = "Яркость одинаковая";
     }
   }
 
