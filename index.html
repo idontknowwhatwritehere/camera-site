@@ -56,9 +56,9 @@ button {
   display: flex;
   justify-content: center;
   padding:
-    calc(env(safe-area-inset-top) + 8px)
+    calc(env(safe-area-inset-top) + clamp(5px, 1.2dvh, 8px))
     10px
-    calc(env(safe-area-inset-bottom) + 10px);
+    calc(env(safe-area-inset-bottom) + clamp(7px, 1.4dvh, 10px));
 }
 
 .content {
@@ -67,24 +67,30 @@ button {
   height: 100%;
   min-width: 0;
   min-height: 0;
+
   display: grid;
-  grid-template-rows:
-    auto
-    auto
-    auto
-    auto
-    minmax(0, 1fr)
-    auto
-    auto
-    auto;
-  row-gap: 7px;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(5px, 1.2dvh, 9px);
+
   overflow: hidden;
+}
+
+.header,
+.footer {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  gap: clamp(5px, 1dvh, 8px);
+}
+
+.footer {
+  justify-items: center;
 }
 
 .top-bar {
   width: 100%;
-  height: 38px;
-  min-height: 38px;
+  height: clamp(32px, 5.2dvh, 38px);
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -93,12 +99,12 @@ button {
 }
 
 .icon-btn {
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
+  width: clamp(32px, 5.2dvh, 38px);
+  height: clamp(32px, 5.2dvh, 38px);
+  min-width: clamp(32px, 5.2dvh, 38px);
   padding: 0;
   border-radius: 13px;
-  font-size: 20px;
+  font-size: clamp(18px, 4vw, 20px);
   line-height: 1;
   background: rgba(255,255,255,.14);
   color: white;
@@ -108,11 +114,11 @@ button {
 }
 
 .login-btn {
-  height: 38px;
+  height: clamp(32px, 5.2dvh, 38px);
   max-width: 55%;
   padding: 0 16px;
   border-radius: 19px;
-  font-size: 15px;
+  font-size: clamp(13px, 3.4vw, 15px);
   background: rgba(255,255,255,.14);
   color: white;
   overflow: hidden;
@@ -129,10 +135,10 @@ button {
 
 .mode-buttons button {
   width: 100%;
-  height: 38px;
+  height: clamp(32px, 5.2dvh, 38px);
   min-width: 0;
   padding: 0 6px;
-  font-size: clamp(14px, 4vw, 18px);
+  font-size: clamp(13px, 3.8vw, 18px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -145,7 +151,7 @@ button.secondary {
 
 h1 {
   margin: 0;
-  font-size: clamp(24px, 7vw, 34px);
+  font-size: clamp(20px, 6vw, 34px);
   line-height: 1.05;
   text-align: center;
   white-space: nowrap;
@@ -155,7 +161,7 @@ h1 {
 
 .top-text {
   margin: 0;
-  font-size: clamp(11px, 3.4vw, 15px);
+  font-size: clamp(10px, 3.2vw, 15px);
   line-height: 1.2;
   color: #cfcfcf;
   text-align: center;
@@ -164,9 +170,10 @@ h1 {
 
 .camera-box {
   position: relative;
-  min-height: 150px;
+  min-width: 0;
+  min-height: 0;
   height: 100%;
-  border-radius: 22px;
+  border-radius: clamp(16px, 4vw, 22px);
   overflow: hidden;
   background: #111;
   box-shadow: 0 10px 26px rgba(0,0,0,.55);
@@ -190,10 +197,10 @@ canvas {
   top: 50%;
   transform: translate(-50%, -50%);
   max-width: calc(100% - 24px);
-  height: 42px;
+  height: clamp(36px, 6dvh, 42px);
   padding: 0 18px;
   z-index: 5;
-  font-size: 15px;
+  font-size: clamp(13px, 3.5vw, 15px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -202,22 +209,28 @@ canvas {
 
 #scanBtn {
   display: none;
-  justify-self: center;
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  z-index: 6;
+
   width: fit-content;
-  max-width: 100%;
-  height: 38px;
+  max-width: calc(100% - 20px);
+  height: clamp(32px, 5.2dvh, 38px);
   padding: 0 20px;
-  font-size: 15px;
+  font-size: clamp(13px, 3.5vw, 15px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
 }
 
 .result {
   width: 100%;
-  min-height: 42px;
+  min-height: clamp(30px, 5.7dvh, 42px);
   padding: 0 6px;
-  font-size: clamp(20px, 6vw, 31px);
+  font-size: clamp(18px, 5.8vw, 31px);
   font-weight: 900;
   line-height: 1.05;
   text-align: center;
@@ -231,9 +244,9 @@ canvas {
 
 .bottom-text {
   width: 100%;
-  min-height: 22px;
+  min-height: clamp(18px, 3.2dvh, 22px);
   padding-bottom: 2px;
-  font-size: clamp(11px, 3.4vw, 15px);
+  font-size: clamp(10px, 3.2vw, 15px);
   line-height: 1.15;
   color: #aaaaaa;
   text-align: center;
@@ -416,34 +429,16 @@ canvas {
   }
 
   .content {
-    row-gap: 5px;
+    gap: 5px;
   }
 
-  .top-bar {
-    height: 34px;
-    min-height: 34px;
-  }
-
-  .icon-btn {
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-    font-size: 18px;
-  }
-
-  .login-btn {
-    height: 34px;
-    font-size: 14px;
-    padding: 0 13px;
-  }
-
-  .mode-buttons button {
-    height: 34px;
-    font-size: clamp(13px, 3.8vw, 16px);
+  .header,
+  .footer {
+    gap: 4px;
   }
 
   h1 {
-    font-size: clamp(21px, 6vw, 28px);
+    font-size: clamp(20px, 5.5vw, 27px);
   }
 
   .top-text {
@@ -451,18 +446,8 @@ canvas {
     line-height: 1.1;
   }
 
-  .camera-box {
-    min-height: 120px;
-    border-radius: 18px;
-  }
-
-  #scanBtn {
-    height: 34px;
-    font-size: 14px;
-  }
-
   .result {
-    min-height: 34px;
+    min-height: 30px;
     font-size: clamp(18px, 5.5vw, 25px);
   }
 
@@ -473,20 +458,48 @@ canvas {
 }
 
 @media (max-height: 610px) {
-  .top-text {
-    display: none;
-  }
-
+  .top-text,
   .bottom-text {
     display: none;
   }
 
-  .camera-box {
-    min-height: 100px;
+  .header,
+  .footer {
+    gap: 3px;
+  }
+
+  h1 {
+    font-size: clamp(18px, 5vw, 24px);
   }
 
   .result {
-    min-height: 30px;
+    min-height: 28px;
+  }
+
+  #scanBtn {
+    bottom: 7px;
+  }
+}
+
+@media (max-height: 520px) {
+  .login-btn {
+    padding: 0 12px;
+  }
+
+  .mode-buttons {
+    gap: 6px;
+  }
+
+  .mode-buttons button {
+    font-size: clamp(12px, 3.6vw, 14px);
+  }
+
+  h1 {
+    font-size: clamp(17px, 4.8vw, 21px);
+  }
+
+  .result {
+    font-size: clamp(16px, 5vw, 21px);
   }
 }
 </style>
@@ -497,34 +510,37 @@ canvas {
 <div class="app">
   <div class="content">
 
-    <div class="top-bar">
-      <button class="icon-btn" id="menuBtn">☰</button>
-      <button class="login-btn" id="loginBtn">Вход</button>
-    </div>
+    <div class="header">
+      <div class="top-bar">
+        <button class="icon-btn" id="menuBtn">☰</button>
+        <button class="login-btn" id="loginBtn">Вход</button>
+      </div>
 
-    <div class="mode-buttons">
-      <button id="liveModeBtn">Версия 1</button>
-      <button id="scanModeBtn" class="secondary">Версия 2</button>
-    </div>
+      <div class="mode-buttons">
+        <button id="liveModeBtn">Версия 1</button>
+        <button id="scanModeBtn" class="secondary">Версия 2</button>
+      </div>
 
-    <h1>Сравнение яркости</h1>
+      <h1>Сравнение яркости</h1>
 
-    <div class="top-text">
-      Двигайте линии пальцем. Высота меняется для обеих сразу.
+      <div class="top-text">
+        Двигайте линии пальцем. Высота меняется для обеих сразу.
+      </div>
     </div>
 
     <div class="camera-box" id="cameraBox">
       <video id="video" autoplay playsinline muted></video>
       <canvas id="overlay"></canvas>
       <button id="startBtn">Открыть камеру</button>
+      <button id="scanBtn">Сканировать 10 секунд</button>
     </div>
 
-    <button id="scanBtn">Сканировать 10 секунд</button>
+    <div class="footer">
+      <div class="result" id="result">Камера не открыта</div>
 
-    <div class="result" id="result">Камера не открыта</div>
-
-    <div class="bottom-text">
-      Более тёмная линия подсвечивается красным
+      <div class="bottom-text">
+        Более тёмная линия подсвечивается красным
+      </div>
     </div>
 
   </div>
@@ -617,6 +633,7 @@ const hiddenCanvas = document.createElement("canvas");
 const hiddenCtx = hiddenCanvas.getContext("2d", { willReadFrequently: true });
 
 let cameraStarted = false;
+let animationStarted = false;
 let mode = "live";
 
 const lines = [
@@ -695,7 +712,7 @@ scanModeBtn.addEventListener("click", () => {
   finalScanResult = null;
   liveHistory = [];
 
-  scanBtn.style.display = "block";
+  scanBtn.style.display = cameraStarted ? "block" : "none";
 
   scanModeBtn.classList.remove("secondary");
   liveModeBtn.classList.add("secondary");
@@ -718,14 +735,22 @@ startBtn.addEventListener("click", async e => {
 
     video.onloadedmetadata = () => {
       video.play();
+
       cameraStarted = true;
       startBtn.style.display = "none";
+
+      if (mode === "scan") {
+        scanBtn.style.display = "block";
+      }
 
       result.textContent = mode === "live"
         ? "Живой режим"
         : "Зафиксируйте камеру и нажмите сканирование";
 
-      loop();
+      if (!animationStarted) {
+        animationStarted = true;
+        loop();
+      }
     };
 
   } catch (err) {
@@ -734,7 +759,9 @@ startBtn.addEventListener("click", async e => {
   }
 });
 
-scanBtn.addEventListener("click", () => {
+scanBtn.addEventListener("click", e => {
+  e.stopPropagation();
+
   if (!cameraStarted || isScanning) return;
 
   scanData = [];
@@ -746,7 +773,7 @@ scanBtn.addEventListener("click", () => {
 });
 
 cameraBox.addEventListener("pointerdown", e => {
-  if (e.target === startBtn) return;
+  if (e.target.closest("button")) return;
 
   e.preventDefault();
 
@@ -826,19 +853,28 @@ function clamp(value, min, max) {
 
 function resizeCanvas() {
   const box = cameraBox.getBoundingClientRect();
-
   const pixelRatio = window.devicePixelRatio || 1;
 
-  canvas.width = Math.round(box.width * pixelRatio);
-  canvas.height = Math.round(box.height * pixelRatio);
+  const canvasWidth = Math.round(box.width * pixelRatio);
+  const canvasHeight = Math.round(box.height * pixelRatio);
 
-  canvas.style.width = `${box.width}px`;
-  canvas.style.height = `${box.height}px`;
+  if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    canvas.style.width = `${box.width}px`;
+    canvas.style.height = `${box.height}px`;
+  }
 
   ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
-  hiddenCanvas.width = video.videoWidth;
-  hiddenCanvas.height = video.videoHeight;
+  if (
+    hiddenCanvas.width !== video.videoWidth ||
+    hiddenCanvas.height !== video.videoHeight
+  ) {
+    hiddenCanvas.width = video.videoWidth;
+    hiddenCanvas.height = video.videoHeight;
+  }
 }
 
 function getVisualLines() {
@@ -854,7 +890,7 @@ function getBrightness(line) {
   const w = hiddenCanvas.width;
   const h = hiddenCanvas.height;
 
-  const x = Math.round(line.x / 100 * w);
+  const x = clamp(Math.round(line.x / 100 * w), 0, w - 1);
   const y1 = lineY1 / 100 * h;
   const y2 = lineY2 / 100 * h;
 
@@ -863,7 +899,7 @@ function getBrightness(line) {
 
   for (let i = 0; i < steps; i++) {
     const t = i / (steps - 1);
-    const y = Math.round(y1 + (y2 - y1) * t);
+    const y = clamp(Math.round(y1 + (y2 - y1) * t), 0, h - 1);
 
     const pixel = hiddenCtx.getImageData(x, y, 1, 1).data;
     total += 0.299 * pixel[0] + 0.587 * pixel[1] + 0.114 * pixel[2];
