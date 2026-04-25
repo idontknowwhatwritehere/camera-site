@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
 <title>Сравнение яркости</title>
 
@@ -15,7 +15,8 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  html, body {
+  html,
+  body {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -30,15 +31,19 @@
   body {
     position: fixed;
     inset: 0;
+    width: 100vw;
+    height: var(--app-height, 100dvh);
   }
 
   .app {
-    width: 100%;
-    height: calc(var(--vh, 1vh) * 100);
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: var(--app-height, 100dvh);
     padding:
-      calc(env(safe-area-inset-top) + 6px)
+      calc(env(safe-area-inset-top) + 5px)
       10px
-      calc(env(safe-area-inset-bottom) + 6px);
+      calc(env(safe-area-inset-bottom) + 5px);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -46,49 +51,22 @@
     background: linear-gradient(135deg, #050505, #171717);
   }
 
-  .top-bar {
+  .top-bar,
+  .mode-buttons,
+  .camera-box,
+  .result,
+  .top-text,
+  .bottom-text {
     width: 100%;
-    height: 34px;
+    max-width: 390px;
+  }
+
+  .top-bar {
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
-  }
-
-  .icon-btn {
-    width: 34px;
-    height: 34px;
-    border-radius: 13px;
-    font-size: 21px;
-    padding: 0;
-    background: rgba(255,255,255,.12);
-    color: white;
-  }
-
-  .login-btn {
-    height: 34px;
-    padding: 0 13px;
-    border-radius: 13px;
-    font-size: 13px;
-    background: rgba(255,255,255,.12);
-    color: white;
-  }
-
-  .mode-buttons {
-    width: 100%;
-    display: flex;
-    gap: 7px;
-    margin-top: 6px;
-    flex-shrink: 0;
-  }
-
-  .mode-buttons button {
-    flex: 1;
-    min-width: 0;
-    height: 34px;
-    padding: 0 8px;
-    font-size: 15px;
-    white-space: nowrap;
   }
 
   button {
@@ -98,43 +76,78 @@
     color: black;
     font-weight: 900;
     cursor: pointer;
+    font-family: inherit;
+  }
+
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 12px;
+    font-size: 19px;
+    line-height: 1;
+    background: rgba(255,255,255,.14);
+    color: white;
+  }
+
+  .login-btn {
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    background: rgba(255,255,255,.14);
+    color: white;
+  }
+
+  .mode-buttons {
+    display: flex;
+    gap: 7px;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .mode-buttons button {
+    flex: 1;
+    min-width: 0;
+    height: 32px;
+    padding: 0 6px;
+    font-size: 15px;
+    white-space: nowrap;
   }
 
   button.secondary {
-    background: rgba(255,255,255,.14);
+    background: rgba(255,255,255,.15);
     color: white;
   }
 
   h1 {
     margin: 6px 0 3px;
-    font-size: 22px;
+    font-size: 21px;
     line-height: 1;
     flex-shrink: 0;
     white-space: nowrap;
   }
 
   .top-text {
-    width: 100%;
     margin-bottom: 6px;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.15;
-    color: #cccccc;
+    color: #cfcfcf;
     text-align: center;
     flex-shrink: 0;
   }
 
   .camera-box {
     position: relative;
-    width: 100%;
-    flex: 1;
-    min-height: 0;
-    max-height: 52vh;
-    border-radius: 22px;
+    height: min(47vh, 410px);
+    min-height: 310px;
+    border-radius: 21px;
     overflow: hidden;
     background: #111;
-    box-shadow: 0 12px 28px rgba(0,0,0,.55);
+    box-shadow: 0 10px 26px rgba(0,0,0,.55);
     border: 2px solid rgba(255,255,255,.12);
     touch-action: none;
+    flex-shrink: 0;
   }
 
   video,
@@ -152,29 +165,28 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    padding: 14px 22px;
+    padding: 13px 20px;
     z-index: 5;
     font-size: 15px;
-    box-shadow: 0 10px 30px rgba(0,255,170,.35);
     white-space: nowrap;
+    box-shadow: 0 10px 30px rgba(0,255,170,.35);
   }
 
   #scanBtn {
-    margin-top: 10px;
-    height: 46px;
-    padding: 0 24px;
-    font-size: 19px;
     display: none;
+    margin-top: 9px;
+    height: 42px;
+    padding: 0 22px;
+    font-size: 17px;
     flex-shrink: 0;
     max-width: 100%;
     white-space: nowrap;
   }
 
   .result {
-    width: 100%;
-    margin-top: 9px;
-    min-height: 38px;
-    font-size: 20px;
+    margin-top: 8px;
+    min-height: 34px;
+    font-size: 18px;
     font-weight: 900;
     line-height: 1.05;
     text-align: center;
@@ -185,40 +197,44 @@
   }
 
   .bottom-text {
-    width: 100%;
     margin-top: 3px;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.1;
     color: #aaaaaa;
     text-align: center;
     flex-shrink: 0;
   }
 
-  @media (max-height: 740px) {
+  @media (max-height: 700px) {
     .camera-box {
-      max-height: 48vh;
+      height: min(43vh, 360px);
+      min-height: 270px;
     }
 
     h1 {
-      font-size: 20px;
+      font-size: 19px;
+      margin-top: 4px;
     }
 
     .top-text {
-      font-size: 11px;
+      font-size: 10px;
+      margin-bottom: 5px;
     }
 
     #scanBtn {
-      height: 42px;
-      font-size: 17px;
+      height: 38px;
+      font-size: 15px;
+      margin-top: 7px;
     }
 
     .result {
-      font-size: 18px;
-      min-height: 34px;
+      font-size: 16px;
+      min-height: 30px;
+      margin-top: 6px;
     }
 
     .bottom-text {
-      font-size: 11px;
+      font-size: 10px;
     }
   }
 </style>
@@ -240,9 +256,9 @@
 
   <h1>Сравнение яркости</h1>
 
- <div class="top-text">
-  Двигайте линии пальцем. Высота меняется для обеих сразу.
- </div>
+  <div class="top-text">
+    Двигайте линии пальцем. Высота меняется для обеих сразу.
+  </div>
 
   <div class="camera-box" id="cameraBox">
     <video id="video" autoplay playsinline muted></video>
@@ -261,14 +277,27 @@
 </div>
 
 <script>
-function setRealHeight() {
- const vh = window.innerHeight * 0.01;
- document.documentElement.style.setProperty("--vh", `${vh}px`);
+function setAppHeight() {
+  const height = window.visualViewport
+    ? window.visualViewport.height
+    : window.innerHeight;
+
+  document.documentElement.style.setProperty("--app-height", `${height}px`);
 }
 
-setRealHeight();
-window.addEventListener("resize", setRealHeight);
-window.addEventListener("orientationchange", setRealHeight);
+setAppHeight();
+
+window.addEventListener("resize", setAppHeight);
+window.addEventListener("orientationchange", setAppHeight);
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", setAppHeight);
+}
+
+document.addEventListener("touchmove", e => {
+  e.preventDefault();
+}, { passive: false });
+
 const video = document.getElementById("video");
 const canvas = document.getElementById("overlay");
 const ctx = canvas.getContext("2d");
@@ -306,10 +335,6 @@ let isScanning = false;
 let scanStartTime = 0;
 let scanData = [];
 let finalScanResult = null;
-
-window.addEventListener("touchmove", e => {
-  e.preventDefault();
-}, { passive: false });
 
 liveModeBtn.addEventListener("click", () => {
   mode = "live";
