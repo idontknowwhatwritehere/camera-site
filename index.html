@@ -33,23 +33,22 @@
   }
 
   .app {
-    width: 100vw;
-    height: 100svh;
+    width: 100%;
+    height: calc(var(--vh, 1vh) * 100);
     padding:
-      calc(env(safe-area-inset-top) + 8px)
-      12px
-      calc(env(safe-area-inset-bottom) + 8px);
+      calc(env(safe-area-inset-top) + 6px)
+      10px
+      calc(env(safe-area-inset-bottom) + 6px);
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: linear-gradient(135deg, #050505, #171717);
     overflow: hidden;
+    background: linear-gradient(135deg, #050505, #171717);
   }
 
   .top-bar {
     width: 100%;
-    max-width: 390px;
-    height: 38px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -57,39 +56,39 @@
   }
 
   .icon-btn {
-    width: 38px;
-    height: 38px;
-    border: none;
-    border-radius: 14px;
+    width: 34px;
+    height: 34px;
+    border-radius: 13px;
+    font-size: 21px;
+    padding: 0;
     background: rgba(255,255,255,.12);
     color: white;
-    font-size: 22px;
-    font-weight: 800;
-    padding: 0;
   }
 
   .login-btn {
-    height: 38px;
-    padding: 0 16px;
-    border: none;
-    border-radius: 14px;
+    height: 34px;
+    padding: 0 13px;
+    border-radius: 13px;
+    font-size: 13px;
     background: rgba(255,255,255,.12);
     color: white;
-    font-size: 14px;
-    font-weight: 700;
   }
 
   .mode-buttons {
     width: 100%;
-    max-width: 390px;
     display: flex;
-    gap: 8px;
+    gap: 7px;
     margin-top: 6px;
     flex-shrink: 0;
   }
 
   .mode-buttons button {
     flex: 1;
+    min-width: 0;
+    height: 34px;
+    padding: 0 8px;
+    font-size: 15px;
+    white-space: nowrap;
   }
 
   button {
@@ -97,8 +96,7 @@
     border-radius: 999px;
     background: linear-gradient(135deg, #00ff88, #00b7ff);
     color: black;
-    font-size: 14px;
-    font-weight: 800;
+    font-weight: 900;
     cursor: pointer;
   }
 
@@ -108,17 +106,18 @@
   }
 
   h1 {
-    margin: 7px 0 4px;
-    font-size: 20px;
-    line-height: 1.05;
+    margin: 6px 0 3px;
+    font-size: 22px;
+    line-height: 1;
     flex-shrink: 0;
+    white-space: nowrap;
   }
 
   .top-text {
-    max-width: 390px;
-    margin-bottom: 7px;
-    font-size: 11px;
-    line-height: 1.25;
+    width: 100%;
+    margin-bottom: 6px;
+    font-size: 12px;
+    line-height: 1.15;
     color: #cccccc;
     text-align: center;
     flex-shrink: 0;
@@ -127,14 +126,13 @@
   .camera-box {
     position: relative;
     width: 100%;
-    max-width: 390px;
     flex: 1;
     min-height: 0;
-    max-height: 56svh;
+    max-height: 52vh;
     border-radius: 22px;
     overflow: hidden;
     background: #111;
-    box-shadow: 0 14px 35px rgba(0,0,0,.55);
+    box-shadow: 0 12px 28px rgba(0,0,0,.55);
     border: 2px solid rgba(255,255,255,.12);
     touch-action: none;
   }
@@ -154,26 +152,31 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    padding: 15px 24px;
+    padding: 14px 22px;
     z-index: 5;
+    font-size: 15px;
     box-shadow: 0 10px 30px rgba(0,255,170,.35);
+    white-space: nowrap;
   }
 
   #scanBtn {
-    margin-top: 9px;
-    padding: 12px 20px;
+    margin-top: 10px;
+    height: 46px;
+    padding: 0 24px;
+    font-size: 19px;
     display: none;
     flex-shrink: 0;
+    max-width: 100%;
+    white-space: nowrap;
   }
 
   .result {
     width: 100%;
-    max-width: 390px;
-    margin-top: 8px;
-    min-height: 42px;
-    font-size: 19px;
+    margin-top: 9px;
+    min-height: 38px;
+    font-size: 20px;
     font-weight: 900;
-    line-height: 1.12;
+    line-height: 1.05;
     text-align: center;
     display: flex;
     align-items: center;
@@ -182,35 +185,40 @@
   }
 
   .bottom-text {
+    width: 100%;
     margin-top: 3px;
-    font-size: 11px;
+    font-size: 12px;
+    line-height: 1.1;
     color: #aaaaaa;
     text-align: center;
     flex-shrink: 0;
   }
 
-  @media (max-height: 760px) {
+  @media (max-height: 740px) {
     .camera-box {
-      max-height: 50svh;
+      max-height: 48vh;
     }
 
     h1 {
-      font-size: 18px;
-      margin-top: 5px;
+      font-size: 20px;
     }
 
-    .top-text,
-    .bottom-text {
-      font-size: 10px;
-    }
-
-    .result {
-      font-size: 17px;
-      min-height: 36px;
+    .top-text {
+      font-size: 11px;
     }
 
     #scanBtn {
-      padding: 10px 18px;
+      height: 42px;
+      font-size: 17px;
+    }
+
+    .result {
+      font-size: 18px;
+      min-height: 34px;
+    }
+
+    .bottom-text {
+      font-size: 11px;
     }
   }
 </style>
@@ -232,9 +240,9 @@
 
   <h1>Сравнение яркости</h1>
 
-  <div class="top-text">
-    Двигайте линии пальцем. Горизонтально — каждую отдельно, вертикальный размер — для обеих сразу.
-  </div>
+ <div class="top-text">
+  Двигайте линии пальцем. Высота меняется для обеих сразу.
+ </div>
 
   <div class="camera-box" id="cameraBox">
     <video id="video" autoplay playsinline muted></video>
@@ -253,6 +261,14 @@
 </div>
 
 <script>
+function setRealHeight() {
+ const vh = window.innerHeight * 0.01;
+ document.documentElement.style.setProperty("--vh", `${vh}px`);
+}
+
+setRealHeight();
+window.addEventListener("resize", setRealHeight);
+window.addEventListener("orientationchange", setRealHeight);
 const video = document.getElementById("video");
 const canvas = document.getElementById("overlay");
 const ctx = canvas.getContext("2d");
