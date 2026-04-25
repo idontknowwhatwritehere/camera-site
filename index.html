@@ -7,7 +7,12 @@
 <title>Сравнение яркости</title>
 
 <style>
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
 
   body {
     margin: 0;
@@ -49,6 +54,8 @@
     box-shadow: 0 20px 50px rgba(0,0,0,.6);
     border: 2px solid rgba(255,255,255,.12);
     touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   video,
@@ -58,6 +65,9 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: none;
   }
 
   button {
@@ -120,13 +130,13 @@ const startBtn = document.getElementById("startBtn");
 const cameraBox = document.getElementById("cameraBox");
 
 const hiddenCanvas = document.createElement("canvas");
-const hiddenCtx = hiddenCanvas.getContext("2d");
+const hiddenCtx = hiddenCanvas.getContext("2d", { willReadFrequently: true });
 
 let cameraStarted = false;
 
 const lines = [
-  { x: 38 },
-  { x: 62 }
+  { id: "A", x: 38 },
+  { id: "B", x: 62 }
 ];
 
 let lineY1 = 25;
@@ -134,6 +144,9 @@ let lineY2 = 75;
 
 let activeLine = null;
 let isResizingVertical = false;
+
+const history = [];
+const AVERAGE_TIME = 10000;
 
 startBtn.addEventListener("click", async () => {
   try {
@@ -158,10 +171,12 @@ startBtn.addEventListener("click", async () => {
 });
 
 cameraBox.addEventListener("pointerdown", e => {
+  e.preventDefault();
+
   const pos = getPointerPercent(e);
 
-  const distanceToLeft = Math.abs(pos.x - lines[0].x);
-  const distanceToRight = Math.abs(pos.x - lines[1].x);
+  const distanceToLine0 = Math.abs(pos.x - lines[0].x);
+  const distanceToLine1 = Math.abs(pos.x - lines[1].x);
 
   const distanceToTop = Math.abs(pos.y - lineY1);
   const distanceToBottom = Math.abs(pos.y - lineY2);
@@ -170,7 +185,7 @@ cameraBox.addEventListener("pointerdown", e => {
     isResizingVertical = true;
     activeLine = null;
   } else {
-    activeLine = distanceToLeft < distanceToRight ? 0 : 1;
+    activeLine = distanceToLine0 < distanceToLine1 ? 0 : 1;
     isResizingVertical = false;
   }
 
@@ -178,6 +193,8 @@ cameraBox.addEventListener("pointerdown", e => {
 });
 
 cameraBox.addEventListener("pointermove", e => {
+  e.preventDefault();
+
   if (activeLine === null && !isResizingVertical) return;
 
   const pos = getPointerPercent(e);
@@ -198,9 +215,13 @@ cameraBox.addEventListener("pointermove", e => {
 cameraBox.addEventListener("pointerup", stopDrag);
 cameraBox.addEventListener("pointercancel", stopDrag);
 
-function stopDrag() {
+function stopDrag(e) {
+  if (e) e.preventDefault();
+
   activeLine = null;
   isResizingVertical = false;
+
+  history.length = 0;
 }
 
 function getPointerPercent(e) {
@@ -249,6 +270,48 @@ function getBrightness(line) {
   return total / steps;
 }
 
+function getVisualLines() {
+  const sorted = [...lines].sort((a, b) => a.x - b.x);
+
+  return {
+    left: sorted[0],
+    right: sorted[1]
+  };
+}
+
+function addToHistory(leftBrightness, rightBrightness) {
+  const now = performance.now();
+
+  history.push({
+    time: now,
+    left: leftBrightness,
+    right: rightBrightness
+  });
+
+  while (history.length && now - history[0].time > AVERAGE_TIME) {
+    history.shift();
+  }
+}
+
+function getAverageBrightness() {
+  if (!history.length) {
+    return { left: 0, right: 0 };
+  }
+
+  let leftTotal = 0;
+  let rightTotal = 0;
+
+  for (const item of history) {
+    leftTotal += item.left;
+    rightTotal += item.right;
+  }
+
+  return {
+    left: leftTotal / history.length,
+    right: rightTotal / history.length
+  };
+}
+
 function drawLine(line, isDarker) {
   const w = canvas.width;
   const h = canvas.height;
@@ -261,15 +324,15 @@ function drawLine(line, isDarker) {
   ctx.lineCap = "round";
 
   ctx.strokeStyle = isDarker
-    ? "rgba(255, 70, 70, 0.65)"
-    : "rgba(0, 255, 150, 0.55)";
+    ? "rgba(255, 70, 70, 0.55)"
+    : "rgba(0, 255, 150, 0.42)";
 
   ctx.beginPath();
   ctx.moveTo(x, y1);
   ctx.lineTo(x, y2);
   ctx.stroke();
 
-  ctx.fillStyle = "rgba(255,255,255,0.75)";
+  ctx.fillStyle = "rgba(255,255,255,0.45)";
 
   ctx.beginPath();
   ctx.arc(x, y1, 8, 0, Math.PI * 2);
@@ -289,20 +352,26 @@ function loop() {
     hiddenCtx.drawImage(video, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const brightness1 = getBrightness(lines[0]);
-    const brightness2 = getBrightness(lines[1]);
+    const visual = getVisualLines();
 
-    drawLine(lines[0], brightness1 < brightness2);
-    drawLine(lines[1], brightness2 < brightness1);
+    const leftNow = getBrightness(visual.left);
+    const rightNow = getBrightness(visual.right);
 
-    const max = Math.max(brightness1, brightness2);
-    const min = Math.min(brightness1, brightness2);
+    addToHistory(leftNow, rightNow);
 
-    let percent = min > 0 ? ((max - min) / min) * 100 : 0;
+    const average = getAverageBrightness();
 
-    if (brightness1 > brightness2) {
+    drawLine(visual.left, average.left < average.right);
+    drawLine(visual.right, average.right < average.left);
+
+    const max = Math.max(average.left, average.right);
+    const min = Math.min(average.left, average.right);
+
+    const percent = min > 0 ? ((max - min) / min) * 100 : 0;
+
+    if (average.left > average.right) {
       result.textContent = `Левая ярче на ${percent.toFixed(1)}%`;
-    } else if (brightness2 > brightness1) {
+    } else if (average.right > average.left) {
       result.textContent = `Правая ярче на ${percent.toFixed(1)}%`;
     } else {
       result.textContent = "Яркость одинаковая";
