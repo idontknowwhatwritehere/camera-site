@@ -228,18 +228,23 @@ canvas {
 
 .result {
   width: 100%;
-  min-height: clamp(30px, 5.7dvh, 42px);
-  padding: 0 6px;
-  font-size: clamp(18px, 5.8vw, 31px);
+  min-height: 30px;
+  padding: 0 8px;
+
+  font-size: clamp(15px, 4.6vw, 24px);
   font-weight: 900;
-  line-height: 1.05;
+  line-height: 1.08;
   text-align: center;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  white-space: normal;
+  text-overflow: clip;
+
+  max-height: 54px;
 }
 
 .bottom-text {
