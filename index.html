@@ -1162,12 +1162,14 @@ cameraBox.addEventListener("pointerdown", e => {
   if (e.target.closest("button")) return;
 
   e.preventDefault();
+
   isDraggingLine = true;
+
   const pos = getPointerPercent(e);
   const visual = getVisualLines();
 
-  const HANDLE_RADIUS = 10;
-  const LINE_TOUCH_RADIUS = 18;
+  const HANDLE_RADIUS = 12;
+  const LINE_TOUCH_RADIUS = 20;
 
   const leftTop = distance(pos.x, pos.y, visual.left.x, lineY1);
   const leftBottom = distance(pos.x, pos.y, visual.left.x, lineY2);
@@ -1187,21 +1189,24 @@ cameraBox.addEventListener("pointerdown", e => {
     return;
   }
 
-  const dLeftLine = Math.abs(pos.x - visual.left.x);
-  const dRightLine = Math.abs(pos.x - visual.right.x);
+  const leftLineDistance = distanceToVerticalSegment(
+    pos.x,
+    pos.y,
+    visual.left.x,
+    lineY1,
+    lineY2
+  );
 
-  const nearLeftLine =
-    dLeftLine <= LINE_TOUCH_RADIUS &&
-    pos.y >= lineY1 - 8 &&
-    pos.y <= lineY2 + 8;
+  const rightLineDistance = distanceToVerticalSegment(
+    pos.x,
+    pos.y,
+    visual.right.x,
+    lineY1,
+    lineY2
+  );
 
-  const nearRightLine =
-    dRightLine <= LINE_TOUCH_RADIUS &&
-    pos.y >= lineY1 - 8 &&
-    pos.y <= lineY2 + 8;
-
-  if (nearLeftLine || nearRightLine) {
-    activeLine = dLeftLine <= dRightLine
+  if (Math.min(leftLineDistance, rightLineDistance) <= LINE_TOUCH_RADIUS) {
+    activeLine = leftLineDistance <= rightLineDistance
       ? lines.indexOf(visual.left)
       : lines.indexOf(visual.right);
 
@@ -1212,8 +1217,8 @@ cameraBox.addEventListener("pointerdown", e => {
 
   activeLine = null;
   resizingEdge = null;
+  isDraggingLine = false;
 });
-
 cameraBox.addEventListener("pointermove", e => {
   if (activeLine === null && resizingEdge === null) return;
 
