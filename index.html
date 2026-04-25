@@ -67,11 +67,9 @@ button {
   height: 100%;
   min-width: 0;
   min-height: 0;
-
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: clamp(5px, 1.2dvh, 9px);
-
   overflow: hidden;
 }
 
@@ -98,6 +96,14 @@ button {
   min-width: 0;
 }
 
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
 .icon-btn {
   width: clamp(32px, 5.2dvh, 38px);
   height: clamp(32px, 5.2dvh, 38px);
@@ -111,6 +117,39 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.lang-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.lang-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 150px;
+  padding: 8px;
+  border-radius: 16px;
+  background: rgba(20,20,20,.96);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 14px 40px rgba(0,0,0,.45);
+  display: none;
+  z-index: 50;
+}
+
+.lang-panel.open {
+  display: grid;
+  gap: 6px;
+}
+
+.lang-panel button {
+  width: 100%;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.12);
+  color: white;
+  font-size: 14px;
 }
 
 .login-btn {
@@ -182,13 +221,18 @@ h1 {
 }
 
 video,
-canvas {
+canvas,
+#photoImage {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   pointer-events: none;
+}
+
+#photoImage {
+  display: none;
 }
 
 #startBtn {
@@ -207,6 +251,23 @@ canvas {
   box-shadow: 0 10px 30px rgba(0,255,170,.35);
 }
 
+#uploadBtn {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 6;
+  max-width: calc(100% - 20px);
+  height: clamp(32px, 5.2dvh, 38px);
+  padding: 0 14px;
+  font-size: clamp(12px, 3.3vw, 14px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: rgba(255,255,255,.18);
+  color: white;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+
 #scanBtn {
   display: none;
   position: absolute;
@@ -214,7 +275,6 @@ canvas {
   bottom: 10px;
   transform: translateX(-50%);
   z-index: 6;
-
   width: fit-content;
   max-width: calc(100% - 20px);
   height: clamp(32px, 5.2dvh, 38px);
@@ -230,20 +290,16 @@ canvas {
   width: 100%;
   min-height: 30px;
   padding: 0 8px;
-
   font-size: clamp(15px, 4.6vw, 24px);
   font-weight: 900;
   line-height: 1.08;
   text-align: center;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   overflow: hidden;
   white-space: normal;
   text-overflow: clip;
-
   max-height: 54px;
 }
 
@@ -251,16 +307,13 @@ canvas {
   width: 100%;
   min-height: 18px;
   padding-bottom: 2px;
-
   font-size: clamp(10px, 3vw, 14px);
   line-height: 1.15;
   color: #aaaaaa;
   text-align: center;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   overflow: hidden;
   white-space: normal;
 }
@@ -487,6 +540,7 @@ canvas {
     bottom: 7px;
   }
 }
+
 @media (max-height: 540px) {
   .app {
     padding:
@@ -543,6 +597,14 @@ canvas {
     border-radius: 16px;
   }
 
+  #uploadBtn {
+    height: 30px;
+    font-size: 12px;
+    padding: 0 10px;
+    top: 8px;
+    right: 8px;
+  }
+
   #scanBtn {
     height: 34px;
     bottom: 8px;
@@ -557,6 +619,7 @@ canvas {
     line-height: 1.05;
   }
 }
+
 @media (max-height: 520px) {
   .login-btn {
     padding: 0 12px;
@@ -589,32 +652,50 @@ canvas {
     <div class="header">
       <div class="top-bar">
         <button class="icon-btn" id="menuBtn">☰</button>
-        <button class="login-btn" id="loginBtn">Вход</button>
+
+        <div class="top-actions">
+          <div class="lang-wrap">
+            <button class="icon-btn" id="langBtn">🌐</button>
+
+            <div class="lang-panel" id="langPanel">
+              <button data-lang="ru">Русский</button>
+              <button data-lang="kk">Қазақша</button>
+              <button data-lang="en">English</button>
+            </div>
+          </div>
+
+          <button class="login-btn" id="loginBtn" data-i18n="login">Вход</button>
+        </div>
       </div>
 
       <div class="mode-buttons">
-        <button id="liveModeBtn">Версия 1</button>
-        <button id="scanModeBtn" class="secondary">Версия 2</button>
+        <button id="liveModeBtn" data-i18n="version1">Версия 1</button>
+        <button id="scanModeBtn" class="secondary" data-i18n="version2">Версия 2</button>
       </div>
 
-      <h1>Сравнение яркости</h1>
+      <h1 data-i18n="title">Сравнение яркости</h1>
 
-      <div class="top-text">
+      <div class="top-text" data-i18n="topText">
         Двигайте линии пальцем. Высота меняется для обеих сразу.
       </div>
     </div>
 
     <div class="camera-box" id="cameraBox">
       <video id="video" autoplay playsinline muted></video>
+      <img id="photoImage" alt="">
       <canvas id="overlay"></canvas>
-      <button id="startBtn">Открыть камеру</button>
-      <button id="scanBtn">Сканировать 10 секунд</button>
+
+      <input id="imageInput" type="file" accept="image/*" hidden>
+
+      <button id="uploadBtn" data-i18n="uploadImage">Загрузить изображение</button>
+      <button id="startBtn" data-i18n="openCamera">Открыть камеру</button>
+      <button id="scanBtn" data-i18n="scan10">Сканировать 10 секунд</button>
     </div>
 
     <div class="footer">
       <div class="result" id="result">Камера не открыта</div>
 
-      <div class="bottom-text">
+      <div class="bottom-text" data-i18n="bottomText">
         Более тёмная линия подсвечивается красным
       </div>
     </div>
@@ -627,8 +708,8 @@ canvas {
 <div class="side-menu" id="sideMenu">
   <div class="side-menu-header">
     <div>
-      <strong>Меню</strong>
-      <span>Просто текст</span>
+      <strong data-i18n="menu">Меню</strong>
+      <span data-i18n="simpleText">Просто текст</span>
     </div>
     <button id="closeMenuBtn">×</button>
   </div>
@@ -643,13 +724,13 @@ canvas {
   <div class="login-card">
     <button class="close-login" id="closeLoginBtn">×</button>
 
-    <h2>Вход</h2>
-    <p>Пока это демо-окно. Здесь потом можно сделать авторизацию.</p>
+    <h2 data-i18n="login">Вход</h2>
+    <p data-i18n="loginDemo">Пока это демо-окно. Здесь потом можно сделать авторизацию.</p>
 
-    <input type="text" placeholder="Имя">
-    <input type="password" placeholder="Пароль">
+    <input type="text" data-i18n-placeholder="name" placeholder="Имя">
+    <input type="password" data-i18n-placeholder="password" placeholder="Пароль">
 
-    <button id="fakeLoginBtn">Войти</button>
+    <button id="fakeLoginBtn" data-i18n="enter">Войти</button>
   </div>
 </div>
 
@@ -684,12 +765,15 @@ document.addEventListener("touchmove", e => {
 }, { passive: false });
 
 const video = document.getElementById("video");
+const photoImage = document.getElementById("photoImage");
 const canvas = document.getElementById("overlay");
 const ctx = canvas.getContext("2d");
 
 const result = document.getElementById("result");
 const startBtn = document.getElementById("startBtn");
 const scanBtn = document.getElementById("scanBtn");
+const uploadBtn = document.getElementById("uploadBtn");
+const imageInput = document.getElementById("imageInput");
 const cameraBox = document.getElementById("cameraBox");
 
 const liveModeBtn = document.getElementById("liveModeBtn");
@@ -705,10 +789,112 @@ const loginModal = document.getElementById("loginModal");
 const closeLoginBtn = document.getElementById("closeLoginBtn");
 const fakeLoginBtn = document.getElementById("fakeLoginBtn");
 
+const langBtn = document.getElementById("langBtn");
+const langPanel = document.getElementById("langPanel");
+
 const hiddenCanvas = document.createElement("canvas");
 const hiddenCtx = hiddenCanvas.getContext("2d", { willReadFrequently: true });
 
+const I18N = {
+  ru: {
+    login: "Вход",
+    guest: "Гость",
+    version1: "Версия 1",
+    version2: "Версия 2",
+    title: "Сравнение яркости",
+    topText: "Двигайте линии пальцем. Высота меняется для обеих сразу.",
+    bottomText: "Более тёмная линия подсвечивается красным",
+    openCamera: "Открыть камеру",
+    scan10: "Сканировать 10 секунд",
+    uploadImage: "Загрузить изображение",
+    menu: "Меню",
+    simpleText: "Просто текст",
+    loginDemo: "Пока это демо-окно. Здесь потом можно сделать авторизацию.",
+    name: "Имя",
+    password: "Пароль",
+    enter: "Войти",
+
+    cameraClosed: "Камера не открыта",
+    liveMode: "Живой режим",
+    scanReady: "Зафиксируйте камеру и нажмите сканирование",
+    positionChanged: "Положение изменено. Нажмите сканирование заново",
+    cameraError: "Ошибка открытия камеры",
+    imageLoaded: "Изображение загружено",
+    noData: "Нет данных",
+    sameBrightness: "Яркость одинаковая",
+    leftBrighter: value => `Левая ярче на ${value}%`,
+    rightBrighter: value => `Правая ярче на ${value}%`,
+    scanning: value => `Сканирование: ${value} сек`
+  },
+
+  kk: {
+    login: "Кіру",
+    guest: "Қонақ",
+    version1: "Нұсқа 1",
+    version2: "Нұсқа 2",
+    title: "Жарықтықты салыстыру",
+    topText: "Сызықтарды саусақпен жылжытыңыз. Биіктік екеуіне бірге өзгереді.",
+    bottomText: "Қараңғырақ сызық қызыл түспен белгіленеді",
+    openCamera: "Камераны ашу",
+    scan10: "10 секунд сканерлеу",
+    uploadImage: "Сурет жүктеу",
+    menu: "Мәзір",
+    simpleText: "Жай мәтін",
+    loginDemo: "Бұл әзірге демо терезе. Кейін мұнда авторизация жасауға болады.",
+    name: "Аты",
+    password: "Құпиясөз",
+    enter: "Кіру",
+
+    cameraClosed: "Камера ашылмаған",
+    liveMode: "Тікелей режим",
+    scanReady: "Камераны бекітіп, сканерлеуді басыңыз",
+    positionChanged: "Орын өзгерді. Сканерлеуді қайта бастаңыз",
+    cameraError: "Камераны ашу қатесі",
+    imageLoaded: "Сурет жүктелді",
+    noData: "Дерек жоқ",
+    sameBrightness: "Жарықтық бірдей",
+    leftBrighter: value => `Сол жақ ${value}% жарығырақ`,
+    rightBrighter: value => `Оң жақ ${value}% жарығырақ`,
+    scanning: value => `Сканерлеу: ${value} сек`
+  },
+
+  en: {
+    login: "Login",
+    guest: "Guest",
+    version1: "Version 1",
+    version2: "Version 2",
+    title: "Brightness comparison",
+    topText: "Move the lines with your finger. Height changes for both at once.",
+    bottomText: "The darker line is highlighted in red",
+    openCamera: "Open camera",
+    scan10: "Scan for 10 seconds",
+    uploadImage: "Upload image",
+    menu: "Menu",
+    simpleText: "Simple text",
+    loginDemo: "This is a demo window for now. Authorization can be added here later.",
+    name: "Name",
+    password: "Password",
+    enter: "Log in",
+
+    cameraClosed: "Camera is not open",
+    liveMode: "Live mode",
+    scanReady: "Hold the camera still and press scan",
+    positionChanged: "Position changed. Start scanning again",
+    cameraError: "Camera opening error",
+    imageLoaded: "Image loaded",
+    noData: "No data",
+    sameBrightness: "Brightness is the same",
+    leftBrighter: value => `Left is brighter by ${value}%`,
+    rightBrighter: value => `Right is brighter by ${value}%`,
+    scanning: value => `Scanning: ${value} sec`
+  }
+};
+
+let currentLang = "ru";
+
 let cameraStarted = false;
+let imageLoaded = false;
+let activeSource = null;
 let animationStarted = false;
 let mode = "live";
 
@@ -731,6 +917,48 @@ let isScanning = false;
 let scanStartTime = 0;
 let scanData = [];
 let finalScanResult = null;
+
+function t(key, value) {
+  const item = I18N[currentLang][key];
+
+  if (typeof item === "function") {
+    return item(value);
+  }
+
+  return item || key;
+}
+
+function applyLanguage() {
+  document.documentElement.lang = currentLang;
+
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    el.placeholder = t(el.dataset.i18nPlaceholder);
+  });
+
+  if (loginBtn.textContent === I18N.ru.guest || loginBtn.textContent === I18N.kk.guest || loginBtn.textContent === I18N.en.guest) {
+    loginBtn.textContent = t("guest");
+  }
+
+  if (!cameraStarted && !imageLoaded) {
+    result.textContent = t("cameraClosed");
+  } else if (mode === "live" && imageLoaded) {
+    result.textContent = t("imageLoaded");
+  } else if (mode === "live") {
+    result.textContent = t("liveMode");
+  } else if (mode === "scan" && !isScanning && !finalScanResult) {
+    result.textContent = t("scanReady");
+  } else if (finalScanResult) {
+    result.textContent = formatResult(finalScanResult, 2);
+  }
+}
+
+function hasSource() {
+  return cameraStarted || imageLoaded;
+}
 
 function openMenu() {
   sideMenu.classList.add("open");
@@ -762,8 +990,71 @@ loginModal.addEventListener("click", e => {
 });
 
 fakeLoginBtn.addEventListener("click", () => {
-  loginBtn.textContent = "Гость";
+  loginBtn.textContent = t("guest");
   closeLogin();
+});
+
+langBtn.addEventListener("click", e => {
+  e.stopPropagation();
+  langPanel.classList.toggle("open");
+});
+
+document.addEventListener("click", e => {
+  if (!e.target.closest(".lang-wrap")) {
+    langPanel.classList.remove("open");
+  }
+});
+
+langPanel.addEventListener("click", e => {
+  const btn = e.target.closest("[data-lang]");
+  if (!btn) return;
+
+  currentLang = btn.dataset.lang;
+  langPanel.classList.remove("open");
+  applyLanguage();
+});
+
+uploadBtn.addEventListener("click", e => {
+  e.stopPropagation();
+  imageInput.click();
+});
+
+imageInput.addEventListener("change", () => {
+  const file = imageInput.files[0];
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+
+  photoImage.onload = () => {
+    URL.revokeObjectURL(url);
+
+    imageLoaded = true;
+    activeSource = "image";
+
+    photoImage.style.display = "block";
+    startBtn.style.display = "none";
+    scanBtn.style.display = "none";
+    uploadBtn.style.display = "block";
+
+    liveHistory = [];
+    scanData = [];
+    finalScanResult = null;
+    isScanning = false;
+
+    mode = "live";
+
+    liveModeBtn.classList.remove("secondary");
+    scanModeBtn.classList.add("secondary");
+
+    result.textContent = t("imageLoaded");
+
+    if (!animationStarted) {
+      animationStarted = true;
+      loop();
+    }
+  };
+
+  photoImage.src = url;
 });
 
 liveModeBtn.addEventListener("click", () => {
@@ -773,12 +1064,13 @@ liveModeBtn.addEventListener("click", () => {
   finalScanResult = null;
   liveHistory = [];
 
+  uploadBtn.style.display = "block";
   scanBtn.style.display = "none";
 
   liveModeBtn.classList.remove("secondary");
   scanModeBtn.classList.add("secondary");
 
-  result.textContent = cameraStarted ? "Живой режим" : "Камера не открыта";
+  result.textContent = hasSource() ? t("liveMode") : t("cameraClosed");
 });
 
 scanModeBtn.addEventListener("click", () => {
@@ -788,14 +1080,24 @@ scanModeBtn.addEventListener("click", () => {
   finalScanResult = null;
   liveHistory = [];
 
+  uploadBtn.style.display = "none";
+
+  if (activeSource === "image") {
+    imageLoaded = false;
+    activeSource = null;
+    photoImage.style.display = "none";
+    photoImage.removeAttribute("src");
+    startBtn.style.display = "block";
+  }
+
   scanBtn.style.display = cameraStarted ? "block" : "none";
 
   scanModeBtn.classList.remove("secondary");
   liveModeBtn.classList.add("secondary");
 
   result.textContent = cameraStarted
-    ? "Зафиксируйте камеру и нажмите сканирование"
-    : "Камера не открыта";
+    ? t("scanReady")
+    : t("cameraClosed");
 });
 
 startBtn.addEventListener("click", async e => {
@@ -813,15 +1115,22 @@ startBtn.addEventListener("click", async e => {
       video.play();
 
       cameraStarted = true;
+      imageLoaded = false;
+      activeSource = "camera";
+
+      photoImage.style.display = "none";
+      photoImage.removeAttribute("src");
+
       startBtn.style.display = "none";
+      uploadBtn.style.display = mode === "live" ? "block" : "none";
 
       if (mode === "scan") {
         scanBtn.style.display = "block";
       }
 
       result.textContent = mode === "live"
-        ? "Живой режим"
-        : "Зафиксируйте камеру и нажмите сканирование";
+        ? t("liveMode")
+        : t("scanReady");
 
       if (!animationStarted) {
         animationStarted = true;
@@ -830,8 +1139,8 @@ startBtn.addEventListener("click", async e => {
     };
 
   } catch (err) {
-    result.textContent = "Ошибка открытия камеры";
-    alert("Ошибка камеры: " + err.message);
+    result.textContent = t("cameraError");
+    alert(t("cameraError") + ": " + err.message);
   }
 });
 
@@ -845,7 +1154,7 @@ scanBtn.addEventListener("click", e => {
   isScanning = true;
   scanStartTime = performance.now();
 
-  result.textContent = "Сканирование: 10.0 сек";
+  result.textContent = t("scanning", "10.0");
 });
 
 cameraBox.addEventListener("pointerdown", e => {
@@ -910,7 +1219,7 @@ function stopDrag(e) {
   isScanning = false;
 
   if (mode === "scan" && cameraStarted) {
-    result.textContent = "Положение изменено. Нажмите сканирование заново";
+    result.textContent = t("positionChanged");
   }
 }
 
@@ -945,12 +1254,46 @@ function resizeCanvas() {
   ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
   if (
-    hiddenCanvas.width !== video.videoWidth ||
-    hiddenCanvas.height !== video.videoHeight
+    hiddenCanvas.width !== canvasWidth ||
+    hiddenCanvas.height !== canvasHeight
   ) {
-    hiddenCanvas.width = video.videoWidth;
-    hiddenCanvas.height = video.videoHeight;
+    hiddenCanvas.width = canvasWidth;
+    hiddenCanvas.height = canvasHeight;
   }
+}
+
+function drawSourceCover(source, sourceWidth, sourceHeight) {
+  const targetWidth = hiddenCanvas.width;
+  const targetHeight = hiddenCanvas.height;
+
+  const sourceRatio = sourceWidth / sourceHeight;
+  const targetRatio = targetWidth / targetHeight;
+
+  let sx = 0;
+  let sy = 0;
+  let sw = sourceWidth;
+  let sh = sourceHeight;
+
+  if (sourceRatio > targetRatio) {
+    sw = sourceHeight * targetRatio;
+    sx = (sourceWidth - sw) / 2;
+  } else {
+    sh = sourceWidth / targetRatio;
+    sy = (sourceHeight - sh) / 2;
+  }
+
+  hiddenCtx.clearRect(0, 0, targetWidth, targetHeight);
+  hiddenCtx.drawImage(
+    source,
+    sx,
+    sy,
+    sw,
+    sh,
+    0,
+    0,
+    targetWidth,
+    targetHeight
+  );
 }
 
 function getVisualLines() {
@@ -1012,22 +1355,23 @@ function getAverage(data) {
 }
 
 function formatResult(avg, digits) {
-  if (!avg) return "Нет данных";
+  if (!avg) return t("noData");
 
   const max = Math.max(avg.left, avg.right);
   const min = Math.min(avg.left, avg.right);
 
   const percent = min > 0 ? ((max - min) / min) * 100 : 0;
+  const value = percent.toFixed(digits);
 
   if (avg.left > avg.right) {
-    return `Левая ярче на ${percent.toFixed(digits)}%`;
+    return t("leftBrighter", value);
   }
 
   if (avg.right > avg.left) {
-    return `Правая ярче на ${percent.toFixed(digits)}%`;
+    return t("rightBrighter", value);
   }
 
-  return "Яркость одинаковая";
+  return t("sameBrightness");
 }
 
 function drawLine(line, isDarker) {
@@ -1061,12 +1405,28 @@ function drawLine(line, isDarker) {
 }
 
 function loop() {
-  if (!cameraStarted) return;
+  if (!hasSource()) return;
 
-  if (video.videoWidth && video.videoHeight) {
+  let sourceReady = false;
+
+  if (activeSource === "camera") {
+    sourceReady = video.videoWidth && video.videoHeight;
+  }
+
+  if (activeSource === "image") {
+    sourceReady = photoImage.naturalWidth && photoImage.naturalHeight;
+  }
+
+  if (sourceReady) {
     resizeCanvas();
 
-    hiddenCtx.drawImage(video, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
+    if (activeSource === "camera") {
+      drawSourceCover(video, video.videoWidth, video.videoHeight);
+    }
+
+    if (activeSource === "image") {
+      drawSourceCover(photoImage, photoImage.naturalWidth, photoImage.naturalHeight);
+    }
 
     const box = cameraBox.getBoundingClientRect();
     ctx.clearRect(0, 0, box.width, box.height);
@@ -1101,7 +1461,7 @@ function loop() {
           right: rightNow
         });
 
-        result.textContent = `Сканирование: ${remaining.toFixed(1)} сек`;
+        result.textContent = t("scanning", remaining.toFixed(1));
 
         if (elapsed >= AVERAGE_TIME) {
           isScanning = false;
@@ -1121,6 +1481,8 @@ function loop() {
 
   requestAnimationFrame(loop);
 }
+
+applyLanguage();
 </script>
 
 </body>
