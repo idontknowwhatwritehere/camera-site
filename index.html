@@ -407,42 +407,14 @@
 <div class="app">
 
   <div class="top-bar">
-    <button class="icon-btn">☰</button>
-    <button class="login-btn">Вход</button>
-  </div>
-<div class="shade" id="shade"></div>
-
-<div class="side-menu" id="sideMenu">
-  <div class="side-menu-header">
-    <div>
-      <strong>Меню</strong>
-      <span>Настройки измерения</span>
-    </div>
-    <button id="closeMenuBtn">×</button>
+    <button class="icon-btn" id="menuBtn">☰</button>
+    <button class="login-btn" id="loginBtn">Вход</button>
   </div>
 
-  <button class="menu-item" id="resetLinesBtn">Сбросить линии</button>
-  <button class="menu-item" id="centerLinesBtn">Поставить по центру</button>
-  <button class="menu-item" id="shortLinesBtn">Короткие линии</button>
-  <button class="menu-item" id="longLinesBtn">Длинные линии</button>
-</div>
-
-<div class="login-modal" id="loginModal">
-  <div class="login-card">
-    <button class="close-login" id="closeLoginBtn">×</button>
-    <h2>Вход</h2>
-    <p>Пока это демо-окно. Здесь потом можно сделать авторизацию.</p>
-
-    <input type="text" placeholder="Имя">
-    <input type="password" placeholder="Пароль">
-
-    <button id="fakeLoginBtn">Войти</button>
+  <div class="mode-buttons">
+    <button id="liveModeBtn">Версия 1</button>
+    <button id="scanModeBtn" class="secondary">Версия 2</button>
   </div>
-</div>
-<div class="top-bar">
-  <button class="icon-btn" id="menuBtn">☰</button>
-  <button class="login-btn" id="loginBtn">Вход</button>
-</div>
 
   <h1>Сравнение яркости</h1>
 
@@ -464,6 +436,37 @@
     Более тёмная линия подсвечивается красным
   </div>
 
+</div>
+
+<div class="shade" id="shade"></div>
+
+<div class="side-menu" id="sideMenu">
+  <div class="side-menu-header">
+    <div>
+      <strong>Меню</strong>
+      <span>Настройки измерения</span>
+    </div>
+    <button id="closeMenuBtn">×</button>
+  </div>
+
+  <button class="menu-item" id="resetLinesBtn">Сбросить линии</button>
+  <button class="menu-item" id="centerLinesBtn">Поставить по центру</button>
+  <button class="menu-item" id="shortLinesBtn">Короткие линии</button>
+  <button class="menu-item" id="longLinesBtn">Длинные линии</button>
+</div>
+
+<div class="login-modal" id="loginModal">
+  <div class="login-card">
+    <button class="close-login" id="closeLoginBtn">×</button>
+
+    <h2>Вход</h2>
+    <p>Пока это демо-окно. Здесь потом можно сделать авторизацию.</p>
+
+    <input type="text" placeholder="Имя">
+    <input type="password" placeholder="Пароль">
+
+    <button id="fakeLoginBtn">Войти</button>
+  </div>
 </div>
 
 <script>
