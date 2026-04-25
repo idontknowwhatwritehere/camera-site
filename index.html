@@ -31,8 +31,14 @@ body {
 body {
   position: fixed;
   inset: 0;
-  width: 100%;
   height: var(--app-height, 100dvh);
+}
+
+button {
+  border: none;
+  font-family: inherit;
+  font-weight: 900;
+  cursor: pointer;
 }
 
 .app {
@@ -49,11 +55,11 @@ body {
     12px
     calc(env(safe-area-inset-bottom) + 12px);
 }
+
 .content {
   width: 100%;
   max-width: 390px;
   height: 100%;
-  min-width: 0;
   min-height: 0;
   display: grid;
   grid-template-rows:
@@ -61,43 +67,19 @@ body {
     38px
     auto
     auto
-    minmax(220px, 1fr)
+    minmax(160px, 1fr)
     auto
-    48px
-    28px;
+    46px
+    24px;
   row-gap: 7px;
   overflow: hidden;
 }
 
-.result {
-  height: 48px;
-  min-height: 48px;
-  padding: 0 8px;
-  font-size: clamp(22px, 6.4vw, 30px);
-  font-weight: 900;
-  line-height: 1;
-  text-align: center;
+.top-bar {
+  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  white-space: nowrap;
-  position: relative;
-  z-index: 2;
-}
-
-.bottom-text {
-  height: 28px;
-  min-height: 28px;
-  font-size: clamp(12px, 3.5vw, 15px);
-  line-height: 1;
-  color: #aaaaaa;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  white-space: nowrap;
+  justify-content: space-between;
 }
 
 .icon-btn {
@@ -109,7 +91,6 @@ body {
   line-height: 1;
   background: rgba(255,255,255,.14);
   color: white;
-  flex: 0 0 auto;
 }
 
 .login-btn {
@@ -119,32 +100,35 @@ body {
   font-size: 16px;
   background: rgba(255,255,255,.14);
   color: white;
-  flex: 0 0 auto;
 }
 
 .mode-buttons {
+  width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 9px;
 }
 
 .mode-buttons button {
-  width: 100%;
   height: 38px;
   min-width: 0;
-  padding: 0 6px;
-  font-size: clamp(15px, 4.4vw, 19px);
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: clamp(15px, 4.5vw, 19px);
   white-space: nowrap;
+  background: linear-gradient(135deg, #00ff88, #00b7ff);
+  color: black;
 }
 
-button.secondary {
+.mode-buttons button.secondary {
   background: rgba(255,255,255,.15);
   color: white;
 }
 
 h1 {
   margin: 0;
-  font-size: clamp(27px, 8vw, 36px);
+  width: 100%;
+  font-size: clamp(26px, 7.8vw, 34px);
   line-height: 1.05;
   text-align: center;
   white-space: nowrap;
@@ -153,17 +137,18 @@ h1 {
 }
 
 .top-text {
+  width: 100%;
   margin: 0;
-  font-size: clamp(12px, 3.5vw, 16px);
+  font-size: clamp(11px, 3.4vw, 15px);
   line-height: 1.15;
   color: #cfcfcf;
   text-align: center;
-  white-space: normal;
   overflow: hidden;
 }
 
 .camera-box {
   position: relative;
+  width: 100%;
   min-height: 0;
   border-radius: 24px;
   overflow: hidden;
@@ -188,10 +173,14 @@ canvas {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  padding: 13px 20px;
+  height: 46px;
+  padding: 0 22px;
+  border-radius: 999px;
   z-index: 5;
   font-size: 15px;
   white-space: nowrap;
+  background: linear-gradient(135deg, #00ff88, #00b7ff);
+  color: black;
   box-shadow: 0 10px 30px rgba(0,255,170,.35);
 }
 
@@ -200,17 +189,22 @@ canvas {
   justify-self: center;
   height: 38px;
   padding: 0 20px;
+  border-radius: 999px;
   font-size: 15px;
   max-width: 100%;
   white-space: nowrap;
+  background: linear-gradient(135deg, #00ff88, #00b7ff);
+  color: black;
 }
 
 .result {
-  min-height: 42px;
+  width: 100%;
+  height: 46px;
+  min-height: 46px;
   padding: 0 8px;
-  font-size: clamp(24px, 7vw, 34px);
+  font-size: clamp(21px, 6vw, 29px);
   font-weight: 900;
-  line-height: 1.05;
+  line-height: 1;
   text-align: center;
   display: flex;
   align-items: center;
@@ -220,72 +214,18 @@ canvas {
 }
 
 .bottom-text {
-  min-height: 22px;
-  padding-bottom: 2px;
-  font-size: clamp(13px, 3.8vw, 17px);
-  line-height: 1.15;
+  width: 100%;
+  height: 24px;
+  min-height: 24px;
+  font-size: clamp(11px, 3.3vw, 14px);
+  line-height: 1;
   color: #aaaaaa;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   white-space: nowrap;
-}
-
-@media (max-height: 720px) {
-.app {
-  padding:
-    calc(env(safe-area-inset-top) + 5px)
-    10px
-    calc(env(safe-area-inset-bottom) + 10px);
-}
-
-  .content {
-    grid-template-rows:
-      32px
-      34px
-      auto
-      auto
-      minmax(0, 1fr)
-      auto
-      auto
-      auto;
-    row-gap: 5px;
-  }
-
-  .top-bar {
-    height: 32px;
-  }
-
-  .icon-btn {
-    width: 32px;
-    height: 32px;
-  }
-
-  .login-btn {
-    height: 32px;
-    font-size: 14px;
-  }
-
-  .mode-buttons button {
-    height: 34px;
-  }
-
-  h1 {
-    font-size: clamp(23px, 7vw, 30px);
-  }
-
-  .top-text {
-    font-size: clamp(11px, 3.2vw, 14px);
-  }
-
-  .result {
-    min-height: 36px;
-    font-size: clamp(21px, 6vw, 28px);
-  }
-
-  .bottom-text {
-    min-height: 18px;
-    font-size: clamp(11px, 3.2vw, 14px);
-  }
 }
 
 .shade {
@@ -422,6 +362,8 @@ canvas {
   color: white;
   font-size: 15px;
   outline: none;
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 .login-card input::placeholder {
@@ -432,6 +374,9 @@ canvas {
   width: 100%;
   height: 44px;
   margin-top: 4px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #00ff88, #00b7ff);
+  color: black;
 }
 
 .close-login {
@@ -446,6 +391,69 @@ canvas {
   color: white;
   font-size: 22px;
 }
+
+@media (max-height: 720px) {
+  .app {
+    padding:
+      calc(env(safe-area-inset-top) + 5px)
+      10px
+      calc(env(safe-area-inset-bottom) + 8px);
+  }
+
+  .content {
+    grid-template-rows:
+      32px
+      34px
+      auto
+      auto
+      minmax(135px, 1fr)
+      auto
+      40px
+      20px;
+    row-gap: 5px;
+  }
+
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+
+  .login-btn {
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .mode-buttons button {
+    height: 34px;
+    font-size: clamp(14px, 4vw, 17px);
+  }
+
+  h1 {
+    font-size: clamp(23px, 6.8vw, 29px);
+  }
+
+  .top-text {
+    font-size: clamp(10px, 3vw, 13px);
+  }
+
+  #scanBtn {
+    height: 34px;
+    font-size: 14px;
+  }
+
+  .result {
+    height: 40px;
+    min-height: 40px;
+    font-size: clamp(19px, 5.5vw, 25px);
+  }
+
+  .bottom-text {
+    height: 20px;
+    min-height: 20px;
+    font-size: clamp(10px, 3vw, 13px);
+  }
+}
 </style>
 </head>
 
@@ -454,15 +462,15 @@ canvas {
 <div class="app">
   <div class="content">
 
-<div class="top-bar">
-  <button class="icon-btn" id="menuBtn">☰</button>
-  <button class="login-btn" id="loginBtn">Вход</button>
-</div>
+    <div class="top-bar">
+      <button class="icon-btn" id="menuBtn">☰</button>
+      <button class="login-btn" id="loginBtn">Вход</button>
+    </div>
 
-<div class="mode-buttons">
-  <button id="liveModeBtn">Версия 1</button>
-  <button id="scanModeBtn" class="secondary">Версия 2</button>
-</div>
+    <div class="mode-buttons">
+      <button id="liveModeBtn">Версия 1</button>
+      <button id="scanModeBtn" class="secondary">Версия 2</button>
+    </div>
 
     <h1>Сравнение яркости</h1>
 
@@ -470,11 +478,11 @@ canvas {
       Двигайте линии пальцем. Высота меняется для обеих сразу.
     </div>
 
-<div class="camera-box" id="cameraBox">
-  <video id="video" autoplay playsinline muted></video>
-  <canvas id="overlay"></canvas>
-  <button id="startBtn">Открыть камеру</button>
-</div>
+    <div class="camera-box" id="cameraBox">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+      <button id="startBtn">Открыть камеру</button>
+    </div>
 
     <button id="scanBtn">Сканировать 10 секунд</button>
 
@@ -486,6 +494,7 @@ canvas {
 
   </div>
 </div>
+
 <div class="shade" id="shade"></div>
 
 <div class="side-menu" id="sideMenu">
@@ -533,9 +542,17 @@ window.addEventListener("orientationchange", setAppHeight);
 
 if (window.visualViewport) {
   window.visualViewport.addEventListener("resize", setAppHeight);
+  window.visualViewport.addEventListener("scroll", setAppHeight);
 }
 
 document.addEventListener("touchmove", e => {
+  if (
+    e.target.closest(".login-card") ||
+    e.target.closest(".side-menu")
+  ) {
+    return;
+  }
+
   e.preventDefault();
 }, { passive: false });
 
@@ -775,8 +792,15 @@ function clamp(value, min, max) {
 function resizeCanvas() {
   const box = cameraBox.getBoundingClientRect();
 
-  canvas.width = box.width;
-  canvas.height = box.height;
+  const pixelRatio = window.devicePixelRatio || 1;
+
+  canvas.width = Math.round(box.width * pixelRatio);
+  canvas.height = Math.round(box.height * pixelRatio);
+
+  canvas.style.width = `${box.width}px`;
+  canvas.style.height = `${box.height}px`;
+
+  ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
   hiddenCanvas.width = video.videoWidth;
   hiddenCanvas.height = video.videoHeight;
@@ -860,12 +884,11 @@ function formatResult(avg, digits) {
 }
 
 function drawLine(line, isDarker) {
-  const w = canvas.width;
-  const h = canvas.height;
+  const box = cameraBox.getBoundingClientRect();
 
-  const x = line.x / 100 * w;
-  const y1 = lineY1 / 100 * h;
-  const y2 = lineY2 / 100 * h;
+  const x = line.x / 100 * box.width;
+  const y1 = lineY1 / 100 * box.height;
+  const y2 = lineY2 / 100 * box.height;
 
   ctx.lineWidth = 7;
   ctx.lineCap = "round";
@@ -897,7 +920,9 @@ function loop() {
     resizeCanvas();
 
     hiddenCtx.drawImage(video, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const box = cameraBox.getBoundingClientRect();
+    ctx.clearRect(0, 0, box.width, box.height);
 
     const visual = getVisualLines();
 
