@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<body style="margin:0; background:black; overflow:hidden;">
+
+<video id="video" autoplay playsinline muted
+  style="position:absolute; width:100%; height:100vh; object-fit:cover;"></video>
+
+<canvas id="overlay"
+  style="position:absolute; width:100%; height:100vh; left:0; top:0;"></canvas>
+
+<div id="info"
+  style="position:absolute; left:10px; top:10px; color:lime; font:18px monospace; background:rgba(0,0,0,.5); padding:10px;">
+</div>
+
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('overlay');
+const ctx = canvas.getContext('2d');
+const info = document.getElementById('info');
+
+const hiddenCanvas = document.createElement('canvas');
+const hiddenCtx = hiddenCanvas.getContext('2d');
+
+// Отрезки, где сравниваем яркость
+// x1/y1/x2/y2 — в процентах от экрана
+const segments = [
+  { name: "A", x1: 20, y1: 50, x2: 45, y2: 50 },
+  { name: "B", x1: 55, y1: 50, x2: 80, y2: 50 },
+  { name: "C", x1: 50, y1: 25, x2: 50, y2: 45 },
+  { name: "D", x1: 50, y1: 55, x2: 50, y2: 75 }
+];
+
+navigator.mediaDevices.getUserMedia({
+  video: {
+    facingMode: { ideal: "environment" } // тыловая камера
+  },
+  audio: false
+})
+.then(stream => {
+  video.srcObject = stream;
+  video.onloadedmetadata = () => {
+    video.play();
+    loop();
+  };
+})
+.catch(err => {
+  alert("Ошибка камеры: " + err);
+});
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  hiddenCanvas.width = video.videoWidth;
+  hiddenCanvas.height = video.videoHeight;
+}
+
+function getBrightnessAlongLine(seg) {
+  const w = hiddenCanvas.width;
+  const h = hiddenCanvas.height;
+
+  const x1 = seg.x1 / 100 * w;
+  const y1 = seg.y1 / 100 * h;
+  const x2 = seg.x2 / 100 * w;
+  const y2 = seg.y2 / 100 * h;
+
+  const steps = 80;
+  let total = 0;
+
+  for (let i = 0; i < steps; i++) {
+    const t = i / (steps - 1);
+    const x = Math.round(x1 + (x2 - x1) * t);
+    const y = Math.round(y1 + (y2 - y1) * t);
+
+    const pixel = hiddenCtx.getImageData(x, y, 1, 1).data;
+
+    const r = pixel[0];
+    const g = pixel[1];
+    const b = pixel[2];
+
+    // Яркость по стандартной формуле восприятия
+    const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+
+    total += brightness;
+  }
+
+  return total / steps;
+}
+
+function drawSegment(seg, brightness) {
+  const w = canvas.width;
+  const h = canvas.height;
+
+  const x1 = seg.x1 / 100 * w;
+  const y1 = seg.y1 / 100 * h;
+  const x2 = seg.x2 / 100 * w;
+  const y2 = seg.y2 / 100 * h;
+
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = brightness > 120 ? "lime" : "red";
+
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+
+  ctx.fillStyle = "yellow";
+  ctx.font = "18px monospace";
+  ctx.fillText(
+    `${seg.name}: ${brightness.toFixed(1)}`,
+    (x1 + x2) / 2 + 8,
+    (y1 + y2) / 2 - 8
+  );
+}
+
+function loop() {
+  if (video.videoWidth && video.videoHeight) {
+    resizeCanvas();
+
+    hiddenCtx.drawImage(video, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let text = "";
+
+    const values = segments.map(seg => {
+      const brightness = getBrightnessAlongLine(seg);
+      drawSegment(seg, brightness);
+      text += `${seg.name}: ${brightness.toFixed(1)}<br>`;
+      return { name: seg.name, brightness };
+    });
+
+    const diffAB = values[0].brightness - values[1].brightness;
+
+    text += `<br>A - B: ${diffAB.toFixed(1)}`;
+
+    info.innerHTML = text;
+  }
+
+  requestAnimationFrame(loop);
+}
+</script>
+
+</body>
+</html>
