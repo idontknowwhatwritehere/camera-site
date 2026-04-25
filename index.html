@@ -29,18 +29,41 @@
   .app {
     width: 100%;
     max-width: 430px;
-    padding: 20px;
+    padding: 16px;
     text-align: center;
   }
 
+  .mode-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+
+  button {
+    padding: 13px 20px;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #00ff88, #00b7ff);
+    color: black;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  button.secondary {
+    background: rgba(255,255,255,.14);
+    color: white;
+  }
+
   h1 {
-    margin: 0 0 14px;
-    font-size: 26px;
+    margin: 0 0 12px;
+    font-size: 25px;
   }
 
   .top-text {
     margin-bottom: 14px;
-    font-size: 15px;
+    font-size: 14px;
     color: #cccccc;
   }
 
@@ -54,8 +77,6 @@
     box-shadow: 0 20px 50px rgba(0,0,0,.6);
     border: 2px solid rgba(255,255,255,.12);
     touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
   }
 
   video,
@@ -65,32 +86,28 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    user-select: none;
-    -webkit-user-select: none;
     pointer-events: none;
   }
 
-  button {
-    margin-top: 18px;
-    padding: 14px 26px;
-    border: none;
-    border-radius: 999px;
-    background: linear-gradient(135deg, #00ff88, #00b7ff);
-    color: black;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
+  #startBtn,
+  #scanBtn {
+    margin-top: 16px;
+  }
+
+  #scanBtn {
+    display: none;
   }
 
   .result {
-    margin-top: 22px;
-    font-size: 24px;
+    margin-top: 20px;
+    font-size: 23px;
     font-weight: 800;
+    min-height: 58px;
   }
 
   .bottom-text {
-    margin-top: 10px;
-    font-size: 14px;
+    margin-top: 8px;
+    font-size: 13px;
     color: #aaaaaa;
   }
 </style>
@@ -100,10 +117,15 @@
 
 <div class="app">
 
+  <div class="mode-buttons">
+    <button id="liveModeBtn">Версия 1</button>
+    <button id="scanModeBtn" class="secondary">Версия 2</button>
+  </div>
+
   <h1>Сравнение яркости</h1>
 
   <div class="top-text">
-    Двигайте линии пальцем. Горизонтально — каждую отдельно, вертикально — обе сразу.
+    Двигайте линии пальцем. Горизонтально — каждую отдельно, вертикальный размер — для обеих сразу.
   </div>
 
   <div class="camera-box" id="cameraBox">
@@ -112,11 +134,12 @@
   </div>
 
   <button id="startBtn">Открыть камеру</button>
+  <button id="scanBtn">Сканировать 10 секунд</button>
 
   <div class="result" id="result">Камера не открыта</div>
 
   <div class="bottom-text">
-    Более тёмная линия меняет цвет
+    Более тёмная линия подсвечивается красным
   </div>
 
 </div>
@@ -125,28 +148,72 @@
 const video = document.getElementById("video");
 const canvas = document.getElementById("overlay");
 const ctx = canvas.getContext("2d");
+
 const result = document.getElementById("result");
 const startBtn = document.getElementById("startBtn");
+const scanBtn = document.getElementById("scanBtn");
 const cameraBox = document.getElementById("cameraBox");
+
+const liveModeBtn = document.getElementById("liveModeBtn");
+const scanModeBtn = document.getElementById("scanModeBtn");
 
 const hiddenCanvas = document.createElement("canvas");
 const hiddenCtx = hiddenCanvas.getContext("2d", { willReadFrequently: true });
 
 let cameraStarted = false;
+let mode = "live";
 
 const lines = [
-  { id: "A", x: 38 },
-  { id: "B", x: 62 }
+  { x: 38 },
+  { x: 62 }
 ];
 
 let lineY1 = 25;
 let lineY2 = 75;
 
 let activeLine = null;
-let isResizingVertical = false;
+let resizingEdge = null;
 
-const history = [];
 const AVERAGE_TIME = 10000;
+
+let liveHistory = [];
+
+let isScanning = false;
+let scanStartTime = 0;
+let scanData = [];
+let finalScanResult = null;
+
+liveModeBtn.addEventListener("click", () => {
+  mode = "live";
+  isScanning = false;
+  scanData = [];
+  finalScanResult = null;
+  liveHistory = [];
+
+  scanBtn.style.display = "none";
+
+  liveModeBtn.classList.remove("secondary");
+  scanModeBtn.classList.add("secondary");
+
+  result.textContent = cameraStarted ? "Живой режим" : "Камера не открыта";
+});
+
+scanModeBtn.addEventListener("click", () => {
+  mode = "scan";
+  isScanning = false;
+  scanData = [];
+  finalScanResult = null;
+  liveHistory = [];
+
+  scanBtn.style.display = "inline-block";
+
+  scanModeBtn.classList.remove("secondary");
+  liveModeBtn.classList.add("secondary");
+
+  result.textContent = cameraStarted
+    ? "Зафиксируйте камеру и нажмите сканирование"
+    : "Камера не открыта";
+});
 
 startBtn.addEventListener("click", async () => {
   try {
@@ -161,6 +228,11 @@ startBtn.addEventListener("click", async () => {
       video.play();
       cameraStarted = true;
       startBtn.style.display = "none";
+
+      result.textContent = mode === "live"
+        ? "Живой режим"
+        : "Зафиксируйте камеру и нажмите сканирование";
+
       loop();
     };
 
@@ -170,23 +242,37 @@ startBtn.addEventListener("click", async () => {
   }
 });
 
+scanBtn.addEventListener("click", () => {
+  if (!cameraStarted || isScanning) return;
+
+  scanData = [];
+  finalScanResult = null;
+  isScanning = true;
+  scanStartTime = performance.now();
+
+  result.textContent = "Сканирование: 10.0 сек";
+});
+
 cameraBox.addEventListener("pointerdown", e => {
   e.preventDefault();
 
   const pos = getPointerPercent(e);
 
-  const distanceToLine0 = Math.abs(pos.x - lines[0].x);
-  const distanceToLine1 = Math.abs(pos.x - lines[1].x);
+  const dLine0 = Math.abs(pos.x - lines[0].x);
+  const dLine1 = Math.abs(pos.x - lines[1].x);
 
-  const distanceToTop = Math.abs(pos.y - lineY1);
-  const distanceToBottom = Math.abs(pos.y - lineY2);
+  const dTop = Math.abs(pos.y - lineY1);
+  const dBottom = Math.abs(pos.y - lineY2);
 
-  if (distanceToTop < 8 || distanceToBottom < 8) {
-    isResizingVertical = true;
+  if (dTop < 7) {
+    resizingEdge = "top";
+    activeLine = null;
+  } else if (dBottom < 7) {
+    resizingEdge = "bottom";
     activeLine = null;
   } else {
-    activeLine = distanceToLine0 < distanceToLine1 ? 0 : 1;
-    isResizingVertical = false;
+    activeLine = dLine0 < dLine1 ? 0 : 1;
+    resizingEdge = null;
   }
 
   cameraBox.setPointerCapture(e.pointerId);
@@ -195,20 +281,20 @@ cameraBox.addEventListener("pointerdown", e => {
 cameraBox.addEventListener("pointermove", e => {
   e.preventDefault();
 
-  if (activeLine === null && !isResizingVertical) return;
+  if (activeLine === null && resizingEdge === null) return;
 
   const pos = getPointerPercent(e);
 
-  if (isResizingVertical) {
-    const center = (lineY1 + lineY2) / 2;
-    let halfSize = Math.abs(pos.y - center);
+  if (resizingEdge === "top") {
+    lineY1 = clamp(pos.y, 5, lineY2 - 12);
+  }
 
-    halfSize = clamp(halfSize, 10, 45);
+  if (resizingEdge === "bottom") {
+    lineY2 = clamp(pos.y, lineY1 + 12, 95);
+  }
 
-    lineY1 = center - halfSize;
-    lineY2 = center + halfSize;
-  } else {
-    lines[activeLine].x = clamp(pos.x, 8, 92);
+  if (activeLine !== null) {
+    lines[activeLine].x = clamp(pos.x, 6, 94);
   }
 });
 
@@ -219,9 +305,16 @@ function stopDrag(e) {
   if (e) e.preventDefault();
 
   activeLine = null;
-  isResizingVertical = false;
+  resizingEdge = null;
 
-  history.length = 0;
+  liveHistory = [];
+  scanData = [];
+  finalScanResult = null;
+  isScanning = false;
+
+  if (mode === "scan" && cameraStarted) {
+    result.textContent = "Положение изменено. Нажмите сканирование заново";
+  }
 }
 
 function getPointerPercent(e) {
@@ -238,13 +331,22 @@ function clamp(value, min, max) {
 }
 
 function resizeCanvas() {
-  const box = canvas.getBoundingClientRect();
+  const box = cameraBox.getBoundingClientRect();
 
   canvas.width = box.width;
   canvas.height = box.height;
 
   hiddenCanvas.width = video.videoWidth;
   hiddenCanvas.height = video.videoHeight;
+}
+
+function getVisualLines() {
+  const sorted = [...lines].sort((a, b) => a.x - b.x);
+
+  return {
+    left: sorted[0],
+    right: sorted[1]
+  };
 }
 
 function getBrightness(line) {
@@ -263,53 +365,56 @@ function getBrightness(line) {
     const y = Math.round(y1 + (y2 - y1) * t);
 
     const pixel = hiddenCtx.getImageData(x, y, 1, 1).data;
-
     total += 0.299 * pixel[0] + 0.587 * pixel[1] + 0.114 * pixel[2];
   }
 
   return total / steps;
 }
 
-function getVisualLines() {
-  const sorted = [...lines].sort((a, b) => a.x - b.x);
-
-  return {
-    left: sorted[0],
-    right: sorted[1]
-  };
-}
-
-function addToHistory(leftBrightness, rightBrightness) {
+function addLiveAverage(left, right) {
   const now = performance.now();
 
-  history.push({
-    time: now,
-    left: leftBrightness,
-    right: rightBrightness
-  });
+  liveHistory.push({ time: now, left, right });
 
-  while (history.length && now - history[0].time > AVERAGE_TIME) {
-    history.shift();
+  while (liveHistory.length && now - liveHistory[0].time > AVERAGE_TIME) {
+    liveHistory.shift();
   }
 }
 
-function getAverageBrightness() {
-  if (!history.length) {
-    return { left: 0, right: 0 };
-  }
+function getAverage(data) {
+  if (!data.length) return null;
 
-  let leftTotal = 0;
-  let rightTotal = 0;
+  let left = 0;
+  let right = 0;
 
-  for (const item of history) {
-    leftTotal += item.left;
-    rightTotal += item.right;
+  for (const item of data) {
+    left += item.left;
+    right += item.right;
   }
 
   return {
-    left: leftTotal / history.length,
-    right: rightTotal / history.length
+    left: left / data.length,
+    right: right / data.length
   };
+}
+
+function formatResult(avg, digits) {
+  if (!avg) return "Нет данных";
+
+  const max = Math.max(avg.left, avg.right);
+  const min = Math.min(avg.left, avg.right);
+
+  const percent = min > 0 ? ((max - min) / min) * 100 : 0;
+
+  if (avg.left > avg.right) {
+    return `Левая ярче на ${percent.toFixed(digits)}%`;
+  }
+
+  if (avg.right > avg.left) {
+    return `Правая ярче на ${percent.toFixed(digits)}%`;
+  }
+
+  return "Яркость одинаковая";
 }
 
 function drawLine(line, isDarker) {
@@ -357,25 +462,47 @@ function loop() {
     const leftNow = getBrightness(visual.left);
     const rightNow = getBrightness(visual.right);
 
-    addToHistory(leftNow, rightNow);
+    let drawAverage = {
+      left: leftNow,
+      right: rightNow
+    };
 
-    const average = getAverageBrightness();
+    if (mode === "live") {
+      addLiveAverage(leftNow, rightNow);
 
-    drawLine(visual.left, average.left < average.right);
-    drawLine(visual.right, average.right < average.left);
+      const avg = getAverage(liveHistory);
+      drawAverage = avg || drawAverage;
 
-    const max = Math.max(average.left, average.right);
-    const min = Math.min(average.left, average.right);
-
-    const percent = min > 0 ? ((max - min) / min) * 100 : 0;
-
-    if (average.left > average.right) {
-      result.textContent = `Левая ярче на ${percent.toFixed(1)}%`;
-    } else if (average.right > average.left) {
-      result.textContent = `Правая ярче на ${percent.toFixed(1)}%`;
-    } else {
-      result.textContent = "Яркость одинаковая";
+      result.textContent = formatResult(avg, 1);
     }
+
+    if (mode === "scan") {
+      if (isScanning) {
+        const now = performance.now();
+        const elapsed = now - scanStartTime;
+        const remaining = Math.max(0, (AVERAGE_TIME - elapsed) / 1000);
+
+        scanData.push({
+          left: leftNow,
+          right: rightNow
+        });
+
+        result.textContent = `Сканирование: ${remaining.toFixed(1)} сек`;
+
+        if (elapsed >= AVERAGE_TIME) {
+          isScanning = false;
+          finalScanResult = getAverage(scanData);
+          result.textContent = formatResult(finalScanResult, 2);
+        }
+
+        drawAverage = getAverage(scanData) || drawAverage;
+      } else if (finalScanResult) {
+        drawAverage = finalScanResult;
+      }
+    }
+
+    drawLine(visual.left, drawAverage.left < drawAverage.right);
+    drawLine(visual.right, drawAverage.right < drawAverage.left);
   }
 
   requestAnimationFrame(loop);
