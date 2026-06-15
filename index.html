@@ -3,1722 +3,336 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-
-<title>Сравнение яркости</title>
-
+<title>Измерение концентрации</title>
 <style>
-* {
-  box-sizing: border-box;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  overscroll-behavior: none;
-  background: #070707;
-  color: white;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-}
-
-body {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: var(--app-height, 100dvh);
-}
-
-button {
-  border: none;
-  outline: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-weight: 800;
-  background: #00d084;
-  color: #04140d;
-  border-radius: 14px;
-}
-
-.app {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: var(--app-height, 100dvh);
-  overflow: hidden;
-  background: linear-gradient(135deg, #050505, #171717);
-  display: flex;
-  justify-content: center;
-  padding:
-    calc(env(safe-area-inset-top) + clamp(5px, 1.2dvh, 8px))
-    10px
-    calc(env(safe-area-inset-bottom) + clamp(7px, 1.4dvh, 10px));
-}
-
-.content {
-  width: 100%;
-  max-width: 430px;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  gap: clamp(5px, 1.2dvh, 9px);
-  overflow: hidden;
-}
-
-.header,
-.footer {
-  min-width: 0;
-  min-height: 0;
-  display: grid;
-  gap: clamp(5px, 1dvh, 8px);
-}
-
-.footer {
-  justify-items: center;
-}
-
-.top-bar {
-  width: 100%;
-  height: clamp(32px, 5.2dvh, 38px);
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-width: 0;
-}
-
-.top-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  justify-content: flex-end;
-  flex: 1;
-}
-
-.icon-btn {
-  width: clamp(32px, 5.2dvh, 38px);
-  height: clamp(32px, 5.2dvh, 38px);
-  min-width: clamp(32px, 5.2dvh, 38px);
-  padding: 0;
-  border-radius: 13px;
-  font-size: clamp(18px, 4vw, 20px);
-  line-height: 1;
-  background: rgba(255,255,255,.14);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.lang-wrap {
-  position: relative;
-  flex: 0 0 auto;
-}
-
-.lang-panel {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 8px);
-  width: 150px;
-  padding: 8px;
-  border-radius: 16px;
-  background: rgba(20,20,20,.96);
-  border: 1px solid rgba(255,255,255,.14);
-  box-shadow: 0 14px 40px rgba(0,0,0,.45);
-  display: none;
-  z-index: 50;
-}
-
-.lang-panel.open {
-  display: grid;
-  gap: 6px;
-}
-
-.lang-panel button {
-  width: 100%;
-  height: 36px;
-  border-radius: 12px;
-  background: rgba(255,255,255,.12);
-  color: white;
-  font-size: 14px;
-}
-
-.login-btn {
-  height: clamp(32px, 5.2dvh, 38px);
-  min-width: 82px;
-  max-width: none;
-  padding: 0 16px;
-  border-radius: 19px;
-  font-size: clamp(13px, 3.4vw, 15px);
-  background: rgba(255,255,255,.14);
-  color: white;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.mode-buttons {
-  width: 100%;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 8px;
-}
-
-.mode-buttons button {
-  width: 100%;
-  height: clamp(32px, 5.2dvh, 38px);
-  min-width: 0;
-  padding: 0 6px;
-  font-size: clamp(13px, 3.8vw, 18px);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-button.secondary {
-  background: rgba(255,255,255,.15);
-  color: white;
-}
-
-h1 {
-  margin: 0;
-  font-size: clamp(20px, 6vw, 34px);
-  line-height: 1.05;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.top-text {
-  margin: 0;
-  font-size: clamp(10px, 3.2vw, 15px);
-  line-height: 1.2;
-  color: #cfcfcf;
-  text-align: center;
-  overflow: hidden;
-}
-
-.camera-box {
-  position: relative;
-  min-width: 0;
-  min-height: 0;
-  height: 100%;
-  border-radius: clamp(16px, 4vw, 22px);
-  overflow: hidden;
-  background: #111;
-  box-shadow: 0 10px 26px rgba(0,0,0,.55);
-  border: 2px solid rgba(255,255,255,.12);
-  touch-action: none;
-}
-
-video,
-canvas,
-#photoImage {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  pointer-events: none;
-}
-
-#photoImage {
-  display: none;
-}
-
-#startBtn {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  max-width: calc(100% - 24px);
-  height: clamp(36px, 6dvh, 42px);
-  padding: 0 18px;
-  z-index: 5;
-  font-size: clamp(13px, 3.5vw, 15px);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  box-shadow: 0 10px 30px rgba(0,255,170,.35);
-}
-
-.upload-footer-btn {
-  width: min(100%, 260px);
-  height: clamp(32px, 5.2dvh, 38px);
-  padding: 0 14px;
-  font-size: clamp(12px, 3.3vw, 14px);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  background: rgba(255,255,255,.18);
-  color: white;
-  box-shadow: 0 8px 24px rgba(0,0,0,.28);
-}
-
-#scanBtn {
-  display: none;
-  position: absolute;
-  left: 50%;
-  bottom: 10px;
-  transform: translateX(-50%);
-  z-index: 6;
-  width: fit-content;
-  max-width: calc(100% - 20px);
-  height: clamp(32px, 5.2dvh, 38px);
-  padding: 0 20px;
-  font-size: clamp(13px, 3.5vw, 15px);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  box-shadow: 0 8px 24px rgba(0,0,0,.4);
-}
-
-.result {
-  width: 100%;
-  min-height: 30px;
-  padding: 0 8px;
-  font-size: clamp(15px, 4.6vw, 24px);
-  font-weight: 900;
-  line-height: 1.08;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  white-space: normal;
-  text-overflow: clip;
-  max-height: 54px;
-}
-
-.bottom-text {
-  width: 100%;
-  min-height: 18px;
-  padding-bottom: 2px;
-  font-size: clamp(10px, 3vw, 14px);
-  line-height: 1.15;
-  color: #aaaaaa;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  white-space: normal;
-}
-
-.shade {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.45);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .25s ease;
-  z-index: 20;
-}
-
-.shade.open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.side-menu {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: min(82vw, 310px);
-  height: var(--app-height, 100dvh);
-  padding:
-    calc(env(safe-area-inset-top) + 14px)
-    14px
-    calc(env(safe-area-inset-bottom) + 14px);
-  background: rgba(18,18,18,.96);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  transform: translateX(-105%);
-  transition: transform .28s ease;
-  z-index: 30;
-  box-shadow: 20px 0 50px rgba(0,0,0,.45);
-  border-right: 1px solid rgba(255,255,255,.12);
-  overflow-y: auto;
-}
-
-.side-menu.open {
-  transform: translateX(0);
-}
-
-.side-menu-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-
-.side-menu-header strong {
-  display: block;
-  font-size: 22px;
-}
-
-.side-menu-header span {
-  display: block;
-  margin-top: 3px;
-  font-size: 12px;
-  color: #aaa;
-}
-
-#closeMenuBtn {
-  width: 34px;
-  height: 34px;
-  min-width: 34px;
-  padding: 0;
-  border-radius: 12px;
-  background: rgba(255,255,255,.12);
-  color: white;
-  font-size: 24px;
-}
-
-.menu-text {
-  width: 100%;
-  min-height: 44px;
-  margin-bottom: 10px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: rgba(255,255,255,.1);
-  color: white;
-  font-size: 15px;
-  font-weight: 800;
-}
-
-.login-modal {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 18px;
-  background: rgba(0,0,0,.55);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .25s ease;
-  z-index: 40;
-}
-
-.login-modal.open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.login-card {
-  position: relative;
-  width: 100%;
-  max-width: 330px;
-  padding: 22px;
-  border-radius: 24px;
-  background: rgba(22,22,22,.96);
-  border: 1px solid rgba(255,255,255,.12);
-  box-shadow: 0 20px 60px rgba(0,0,0,.55);
-  text-align: center;
-}
-
-.login-card h2 {
-  margin: 0 0 8px;
-  font-size: 24px;
-}
-
-.login-card p {
-  margin: 0 0 16px;
-  color: #aaa;
-  font-size: 13px;
-  line-height: 1.35;
-}
-
-.login-card input {
-  width: 100%;
-  height: 44px;
-  margin-bottom: 10px;
-  padding: 0 14px;
-  border: none;
-  border-radius: 14px;
-  background: rgba(255,255,255,.1);
-  color: white;
-  font-size: 15px;
-  outline: none;
-}
-
-.login-card input::placeholder {
-  color: #888;
-}
-
-#fakeLoginBtn {
-  width: 100%;
-  height: 44px;
-  margin-top: 4px;
-}
-
-.close-login {
-  position: absolute;
-  right: 12px;
-  top: 12px;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border-radius: 12px;
-  background: rgba(255,255,255,.12);
-  color: white;
-  font-size: 22px;
-}
-
-@media (max-height: 720px) {
-  .app {
-    padding:
-      calc(env(safe-area-inset-top) + 5px)
-      8px
-      calc(env(safe-area-inset-bottom) + 8px);
-  }
-
-  .content {
-    gap: 5px;
-  }
-
-  .header,
-  .footer {
-    gap: 4px;
-  }
-
-  h1 {
-    font-size: clamp(20px, 5.5vw, 27px);
-  }
-
-  .top-text {
-    font-size: clamp(10px, 3vw, 13px);
-    line-height: 1.1;
-  }
-
-  .result {
-    min-height: 30px;
-    font-size: clamp(18px, 5.5vw, 25px);
-  }
-
-  .bottom-text {
-    min-height: 18px;
-    font-size: clamp(10px, 3vw, 13px);
-  }
-}
-
-@media (max-height: 610px) {
-  .top-text,
-  .bottom-text {
-    display: none;
-  }
-
-  .header,
-  .footer {
-    gap: 3px;
-  }
-
-  h1 {
-    font-size: clamp(18px, 5vw, 24px);
-  }
-
-  .result {
-    min-height: 28px;
-  }
-
-  #scanBtn {
-    bottom: 7px;
-  }
-}
-
-@media (max-height: 540px) {
-  .app {
-    padding:
-      calc(env(safe-area-inset-top) + 4px)
-      8px
-      calc(env(safe-area-inset-bottom) + 5px);
-  }
-
-  .content {
-    gap: 4px;
-  }
-
-  .header {
-    gap: 4px;
-  }
-
-  .footer {
-    gap: 2px;
-  }
-
-  .top-text,
-  .bottom-text {
-    display: none;
-  }
-
-  h1 {
-    display: none;
-  }
-
-  .top-bar {
-    height: 30px;
-  }
-
-  .icon-btn {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    border-radius: 10px;
-    font-size: 17px;
-  }
-
-  .login-btn {
-    height: 30px;
-    min-width: 72px;
-    font-size: 13px;
-    padding: 0 12px;
-  }
-
-  .mode-buttons button {
-    height: 30px;
-    font-size: 13px;
-  }
-
-  .camera-box {
-    border-radius: 16px;
-  }
-
-.upload-footer-btn {
-  height: 30px;
-  font-size: 12px;
-  padding: 0 10px;
-}
-
-  #scanBtn {
-    height: 34px;
-    bottom: 8px;
-    padding: 0 16px;
-    font-size: 14px;
-  }
-
-  .result {
-    min-height: 26px;
-    max-height: 38px;
-    font-size: clamp(14px, 4vw, 18px);
-    line-height: 1.05;
-  }
-}
-
-@media (max-height: 520px) {
-  .login-btn {
-    padding: 0 12px;
-  }
-
-  .mode-buttons {
-    gap: 6px;
-  }
-
-  .mode-buttons button {
-    font-size: clamp(12px, 3.6vw, 14px);
-  }
-
-  h1 {
-    font-size: clamp(17px, 4.8vw, 21px);
-  }
-
-  .result {
-    font-size: clamp(16px, 5vw, 21px);
-  }
-}
+*{box-sizing:border-box;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:#070707;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+body{position:fixed;inset:0;height:var(--app-height,100dvh)}
+button{border:0;outline:0;cursor:pointer;font-family:inherit;font-weight:800;background:#00d084;color:#04140d;border-radius:14px}
+.app{position:fixed;inset:0;width:100%;height:var(--app-height,100dvh);overflow:hidden;background:linear-gradient(135deg,#050505,#171717);display:flex;justify-content:center;padding:calc(env(safe-area-inset-top) + clamp(5px,1.2dvh,8px)) 10px calc(env(safe-area-inset-bottom) + clamp(7px,1.4dvh,10px))}
+.content{width:100%;max-width:430px;height:100%;min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:clamp(5px,1.2dvh,9px);overflow:hidden}
+.header,.footer{min-width:0;min-height:0;display:grid;gap:clamp(5px,1dvh,8px)}
+.footer{justify-items:center}
+.top-bar{width:100%;height:clamp(32px,5.2dvh,38px);display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+.top-actions{display:flex;align-items:center;gap:8px;min-width:0;justify-content:flex-end;flex:1}
+.icon-btn{width:clamp(32px,5.2dvh,38px);height:clamp(32px,5.2dvh,38px);min-width:clamp(32px,5.2dvh,38px);padding:0;border-radius:13px;font-size:clamp(18px,4vw,20px);line-height:1;background:rgba(255,255,255,.14);color:#fff;display:flex;align-items:center;justify-content:center}
+.lang-wrap{position:relative;flex:0 0 auto}
+.lang-panel{position:absolute;right:0;top:calc(100% + 8px);width:150px;padding:8px;border-radius:16px;background:rgba(20,20,20,.96);border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 40px rgba(0,0,0,.45);display:none;z-index:50}
+.lang-panel.open{display:grid;gap:6px}.lang-panel button{width:100%;height:36px;border-radius:12px;background:rgba(255,255,255,.12);color:#fff;font-size:14px}
+.login-btn{height:clamp(32px,5.2dvh,38px);min-width:82px;padding:0 16px;border-radius:19px;font-size:clamp(13px,3.4vw,15px);background:rgba(255,255,255,.14);color:#fff;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+h1{margin:0;font-size:clamp(20px,6vw,32px);line-height:1.05;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-text{margin:0;font-size:clamp(10px,3.2vw,15px);line-height:1.2;color:#cfcfcf;text-align:center;overflow:hidden}
+.camera-box{position:relative;min-width:0;min-height:0;height:100%;border-radius:clamp(16px,4vw,22px);overflow:hidden;background:#111;box-shadow:0 10px 26px rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.12);touch-action:none}
+video,canvas,#photoImage{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+#photoImage{display:none}
+.center-btn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:calc(100% - 24px);height:clamp(36px,6dvh,42px);padding:0 18px;z-index:5;font-size:clamp(13px,3.5vw,15px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 10px 30px rgba(0,255,170,.35)}
+.upload-footer-btn{width:min(100%,260px);height:clamp(32px,5.2dvh,38px);padding:0 14px;font-size:clamp(12px,3.3vw,14px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:rgba(255,255,255,.18);color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+.result{width:100%;min-height:42px;padding:0 8px;font-size:clamp(20px,6vw,32px);font-weight:900;line-height:1.12;text-align:center;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:normal;max-height:72px}
+.bottom-text{width:100%;min-height:18px;padding-bottom:2px;font-size:clamp(10px,3vw,14px);line-height:1.15;color:#aaa;text-align:center;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:normal}
+.shade{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:20}.shade.open{opacity:1;pointer-events:auto}
+.side-menu{position:fixed;left:0;top:0;width:min(82vw,310px);height:var(--app-height,100dvh);padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 14px);background:rgba(18,18,18,.96);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);transform:translateX(-105%);transition:transform .28s ease;z-index:30;box-shadow:20px 0 50px rgba(0,0,0,.45);border-right:1px solid rgba(255,255,255,.12);overflow-y:auto}.side-menu.open{transform:translateX(0)}
+.side-menu-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}.side-menu-header strong{display:block;font-size:22px}#closeMenuBtn{width:34px;height:34px;min-width:34px;padding:0;border-radius:12px;background:rgba(255,255,255,.12);color:#fff;font-size:24px}
+.login-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:40}.login-modal.open{opacity:1;pointer-events:auto}.login-card{position:relative;width:100%;max-width:330px;padding:22px;border-radius:24px;background:rgba(22,22,22,.96);border:1px solid rgba(255,255,255,.12);box-shadow:0 20px 60px rgba(0,0,0,.55);text-align:center}.login-card h2{margin:0 0 8px;font-size:24px}.login-card p{margin:0 0 16px;color:#aaa;font-size:13px;line-height:1.35}.login-card input{width:100%;height:44px;margin-bottom:10px;padding:0 14px;border:0;border-radius:14px;background:rgba(255,255,255,.1);color:#fff;font-size:15px;outline:0}.login-card input::placeholder{color:#888}#fakeLoginBtn{width:100%;height:44px;margin-top:4px}.close-login{position:absolute;right:12px;top:12px;width:32px;height:32px;padding:0;border-radius:12px;background:rgba(255,255,255,.12);color:#fff;font-size:22px}
+@media(max-height:610px){.top-text,.bottom-text{display:none}.header,.footer{gap:3px}h1{font-size:clamp(18px,5vw,24px)}.result{min-height:32px}}
+@media(max-height:540px){.app{padding:calc(env(safe-area-inset-top) + 4px) 8px calc(env(safe-area-inset-bottom) + 5px)}.content{gap:4px}.header{gap:4px}.footer{gap:2px}.top-text,.bottom-text,h1{display:none}.top-bar,.login-btn,.upload-footer-btn{height:30px}.icon-btn{width:30px;height:30px;min-width:30px;border-radius:10px;font-size:17px}.login-btn{min-width:72px;font-size:13px;padding:0 12px}.camera-box{border-radius:16px}.result{min-height:30px;max-height:50px;font-size:clamp(18px,5vw,24px)}}
 </style>
 </head>
-
 <body>
-
-<div class="app">
-  <div class="content">
-
-    <div class="header">
-      <div class="top-bar">
-        <button class="icon-btn" id="menuBtn">☰</button>
-
-        <div class="top-actions">
-          <div class="lang-wrap">
-            <button class="icon-btn" id="langBtn">🌐</button>
-
-            <div class="lang-panel" id="langPanel">
-              <button data-lang="ru">Русский</button>
-              <button data-lang="kk">Қазақша</button>
-              <button data-lang="en">English</button>
-            </div>
+<div class="app"><div class="content">
+  <div class="header">
+    <div class="top-bar">
+      <button class="icon-btn" id="menuBtn">☰</button>
+      <div class="top-actions">
+        <div class="lang-wrap">
+          <button class="icon-btn" id="langBtn">🌐</button>
+          <div class="lang-panel" id="langPanel">
+            <button data-lang="ru">Русский</button>
+            <button data-lang="kk">Қазақша</button>
+            <button data-lang="en">English</button>
           </div>
-
-          <button class="login-btn" id="loginBtn" data-i18n="login">Вход</button>
         </div>
-      </div>
-
-      <div class="mode-buttons">
-        <button id="liveModeBtn" data-i18n="version1">Версия 1</button>
-        <button id="scanModeBtn" class="secondary" data-i18n="version2">Версия 2</button>
-      </div>
-
-      <h1 data-i18n="title">Сравнение яркости</h1>
-
-      <div class="top-text" data-i18n="topText">
-        Двигайте линии пальцем. Высота меняется для обеих сразу.
+        <button class="login-btn" id="loginBtn" data-i18n="login">Вход</button>
       </div>
     </div>
-
-<div class="camera-box" id="cameraBox">
-  <video id="video" autoplay playsinline muted></video>
-  <img id="photoImage" alt="">
-  <canvas id="overlay"></canvas>
-
-  <input id="imageInput" type="file" accept="image/*" hidden>
-
-  <button id="startBtn" data-i18n="openCamera">Открыть камеру</button>
-  <button id="scanBtn" data-i18n="scan10">Сканировать 10 секунд</button>
-</div>
-
-<div class="footer">
-  <button id="uploadBtn" class="upload-footer-btn" data-i18n="uploadImage">
-    Загрузить изображение
-  </button>
-
-  <div class="result" id="result">Камера не открыта</div>
-
-  <div class="bottom-text" data-i18n="bottomText">
-    Более тёмная линия подсвечивается красным
+    <h1 data-i18n="title">Концентрация</h1>
+    <div class="top-text" id="hintText" data-i18n="hint">Откройте камеру или загрузите изображение. Обведите пятно.</div>
   </div>
-</div>
 
+  <div class="camera-box" id="cameraBox">
+    <video id="video" autoplay playsinline muted></video>
+    <img id="photoImage" alt="">
+    <canvas id="overlay"></canvas>
+    <input id="imageInput" type="file" accept="image/*" hidden>
+    <button id="startBtn" class="center-btn" data-i18n="openCamera">Открыть камеру</button>
   </div>
-</div>
+
+  <div class="footer">
+    <button id="uploadBtn" class="upload-footer-btn" data-i18n="uploadImage">Загрузить изображение</button>
+    <div class="result" id="result" data-i18n="cameraClosed">Камера не открыта</div>
+    <div class="bottom-text" id="bottomText" data-i18n="bottom">Концентрация в мг/мл</div>
+  </div>
+</div></div>
 
 <div class="shade" id="shade"></div>
-
 <div class="side-menu" id="sideMenu">
   <div class="side-menu-header">
-    <div>
-      <strong data-i18n="menu">Меню</strong>
-      <span data-i18n="simpleText">Просто текст</span>
-    </div>
+    <div><strong data-i18n="menu">Меню</strong></div>
     <button id="closeMenuBtn">×</button>
   </div>
-
-  <div class="menu-text">Текст 1</div>
-  <div class="menu-text">Текст 2</div>
-  <div class="menu-text">Текст 3</div>
-  <div class="menu-text">Текст 4</div>
 </div>
 
 <div class="login-modal" id="loginModal">
   <div class="login-card">
     <button class="close-login" id="closeLoginBtn">×</button>
-
     <h2 data-i18n="login">Вход</h2>
-    <p data-i18n="loginDemo">Пока это демо-окно. Здесь потом можно сделать авторизацию.</p>
-
+    <p data-i18n="loginDemo">Это демо-окно. Авторизацию можно добавить позже.</p>
     <input type="text" data-i18n-placeholder="name" placeholder="Имя">
     <input type="password" data-i18n-placeholder="password" placeholder="Пароль">
-
     <button id="fakeLoginBtn" data-i18n="enter">Войти</button>
   </div>
 </div>
 
 <script>
-function setAppHeight() {
-  const height = window.visualViewport
-    ? window.visualViewport.height
-    : window.innerHeight;
+function setAppHeight(){const h=window.visualViewport?window.visualViewport.height:window.innerHeight;document.documentElement.style.setProperty('--app-height',h+'px')}
+setAppHeight();window.addEventListener('resize',setAppHeight);window.addEventListener('orientationchange',setAppHeight);if(window.visualViewport){visualViewport.addEventListener('resize',setAppHeight);visualViewport.addEventListener('scroll',setAppHeight)}
 
-  document.documentElement.style.setProperty("--app-height", `${height}px`);
+document.addEventListener('touchmove',e=>{if(e.target.closest('.login-card')||e.target.closest('.side-menu'))return;e.preventDefault()},{passive:false});
+
+const video=document.getElementById('video');
+const photoImage=document.getElementById('photoImage');
+const canvas=document.getElementById('overlay');
+const ctx=canvas.getContext('2d');
+const result=document.getElementById('result');
+const startBtn=document.getElementById('startBtn');
+const uploadBtn=document.getElementById('uploadBtn');
+const imageInput=document.getElementById('imageInput');
+const cameraBox=document.getElementById('cameraBox');
+const menuBtn=document.getElementById('menuBtn');
+const closeMenuBtn=document.getElementById('closeMenuBtn');
+const sideMenu=document.getElementById('sideMenu');
+const shade=document.getElementById('shade');
+const loginBtn=document.getElementById('loginBtn');
+const loginModal=document.getElementById('loginModal');
+const closeLoginBtn=document.getElementById('closeLoginBtn');
+const fakeLoginBtn=document.getElementById('fakeLoginBtn');
+const langBtn=document.getElementById('langBtn');
+const langPanel=document.getElementById('langPanel');
+const hiddenCanvas=document.createElement('canvas');
+const hiddenCtx=hiddenCanvas.getContext('2d',{willReadFrequently:true});
+
+const I18N={
+  ru:{login:'Вход',guest:'Гость',title:'Концентрация',hint:'Откройте камеру или загрузите изображение. Обведите пятно.',openCamera:'Открыть камеру',uploadImage:'Загрузить изображение',menu:'Меню',loginDemo:'Это демо-окно. Авторизацию можно добавить позже.',name:'Имя',password:'Пароль',enter:'Войти',cameraClosed:'Камера не открыта',imageLoaded:'Изображение загружено',spotReady:'Обведите пятно',drawingSpot:'Замкните контур',spotTooSmall:'Область слишком маленькая',bottom:'Концентрация в мг/мл',cameraError:'Ошибка камеры'},
+  kk:{login:'Кіру',guest:'Қонақ',title:'Концентрация',hint:'Камераны ашыңыз немесе сурет жүктеңіз. Дақты қоршаңыз.',openCamera:'Камераны ашу',uploadImage:'Сурет жүктеу',menu:'Мәзір',loginDemo:'Бұл демо терезе. Авторизацияны кейін қосуға болады.',name:'Аты',password:'Құпиясөз',enter:'Кіру',cameraClosed:'Камера ашылмаған',imageLoaded:'Сурет жүктелді',spotReady:'Дақты қоршаңыз',drawingSpot:'Контурды жабыңыз',spotTooSmall:'Аймақ тым кішкентай',bottom:'Концентрация мг/мл',cameraError:'Камера қатесі'},
+  en:{login:'Login',guest:'Guest',title:'Concentration',hint:'Open the camera or upload an image. Circle the spot.',openCamera:'Open camera',uploadImage:'Upload image',menu:'Menu',loginDemo:'This is a demo window. Authorization can be added later.',name:'Name',password:'Password',enter:'Log in',cameraClosed:'Camera is not open',imageLoaded:'Image loaded',spotReady:'Circle the spot',drawingSpot:'Close the contour',spotTooSmall:'Area is too small',bottom:'Concentration in mg/ml',cameraError:'Camera error'}
+};
+
+let currentLang='ru';
+let cameraStarted=false;
+let imageLoaded=false;
+let activeSource=null;
+let currentPoints=[];
+let finalSpotResult=null;
+let isDrawingSpot=false;
+
+function t(k){return I18N[currentLang][k]||k}
+function hasSource(){return cameraStarted||imageLoaded}
+function applyLanguage(){
+  document.documentElement.lang=currentLang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.dataset.i18nPlaceholder));
+  if(['Гость','Қонақ','Guest'].includes(loginBtn.textContent))loginBtn.textContent=t('guest');
+  if(!hasSource())result.textContent=t('cameraClosed');
+  else if(finalSpotResult)result.textContent=formatSpotResult(finalSpotResult);
+  else result.textContent=t('spotReady');
 }
+function openMenu(){sideMenu.classList.add('open');shade.classList.add('open')}
+function closeMenu(){sideMenu.classList.remove('open');shade.classList.remove('open')}
+function openLogin(){loginModal.classList.add('open')}
+function closeLogin(){loginModal.classList.remove('open')}
 
-setAppHeight();
+menuBtn.onclick=openMenu;closeMenuBtn.onclick=closeMenu;shade.onclick=closeMenu;
+loginBtn.onclick=openLogin;closeLoginBtn.onclick=closeLogin;loginModal.onclick=e=>{if(e.target===loginModal)closeLogin()};
+fakeLoginBtn.onclick=()=>{loginBtn.textContent=t('guest');closeLogin()};
+langBtn.onclick=e=>{e.stopPropagation();langPanel.classList.toggle('open')};
+document.addEventListener('click',e=>{if(!e.target.closest('.lang-wrap'))langPanel.classList.remove('open')});
+langPanel.onclick=e=>{const b=e.target.closest('[data-lang]');if(!b)return;currentLang=b.dataset.lang;langPanel.classList.remove('open');applyLanguage()};
 
-window.addEventListener("resize", setAppHeight);
-window.addEventListener("orientationchange", setAppHeight);
-
-if (window.visualViewport) {
-  window.visualViewport.addEventListener("resize", setAppHeight);
-  window.visualViewport.addEventListener("scroll", setAppHeight);
-}
-
-document.addEventListener("touchmove", e => {
-  if (
-    e.target.closest(".login-card") ||
-    e.target.closest(".side-menu")
-  ) {
-    return;
-  }
-
-  e.preventDefault();
-}, { passive: false });
-
-const video = document.getElementById("video");
-const photoImage = document.getElementById("photoImage");
-const canvas = document.getElementById("overlay");
-const ctx = canvas.getContext("2d");
-
-const result = document.getElementById("result");
-const startBtn = document.getElementById("startBtn");
-const scanBtn = document.getElementById("scanBtn");
-const uploadBtn = document.getElementById("uploadBtn");
-const imageInput = document.getElementById("imageInput");
-const cameraBox = document.getElementById("cameraBox");
-
-const liveModeBtn = document.getElementById("liveModeBtn");
-const scanModeBtn = document.getElementById("scanModeBtn");
-
-const menuBtn = document.getElementById("menuBtn");
-const closeMenuBtn = document.getElementById("closeMenuBtn");
-const sideMenu = document.getElementById("sideMenu");
-const shade = document.getElementById("shade");
-
-const loginBtn = document.getElementById("loginBtn");
-const loginModal = document.getElementById("loginModal");
-const closeLoginBtn = document.getElementById("closeLoginBtn");
-const fakeLoginBtn = document.getElementById("fakeLoginBtn");
-
-const langBtn = document.getElementById("langBtn");
-const langPanel = document.getElementById("langPanel");
-
-const hiddenCanvas = document.createElement("canvas");
-const hiddenCtx = hiddenCanvas.getContext("2d", { willReadFrequently: true });
-
-const I18N = {
-  ru: {
-    login: "Вход",
-    guest: "Гость",
-    version1: "Версия 1",
-    version2: "Версия 2",
-    title: "Сравнение яркости",
-    topText: "Двигайте линии пальцем. Высота меняется для обеих сразу.",
-    bottomText: "Более тёмная линия подсвечивается красным",
-    openCamera: "Открыть камеру",
-    scan10: "Сканировать 10 секунд",
-    uploadImage: "Загрузить изображение",
-    menu: "Меню",
-    simpleText: "Просто текст",
-    loginDemo: "Пока это демо-окно. Здесь потом можно сделать авторизацию.",
-    name: "Имя",
-    password: "Пароль",
-    enter: "Войти",
-    cameraClosed: "Камера не открыта",
-    liveMode: "Живой режим",
-    scanReady: "Зафиксируйте камеру и нажмите сканирование",
-    positionChanged: "Положение изменено. Нажмите сканирование заново",
-    cameraError: "Ошибка открытия камеры",
-    imageLoaded: "Изображение загружено",
-    noData: "Нет данных",
-    sameBrightness: "Яркость одинаковая",
-    leftBrighter: value => `Левая ярче на ${value}%`,
-    rightBrighter: value => `Правая ярче на ${value}%`,
-    scanning: value => `Сканирование: ${value} сек`,
-    spotReady: "Обведите пятно пальцем",
-    drawingSpot: "Отпустите палец, чтобы посчитать",
-    spotTooSmall: "Область слишком маленькая",
-    spotIntensity: value => `Концентрация: ${value} мг/мл`
-  },
-
-  kk: {
-    login: "Кіру",
-    guest: "Қонақ",
-    version1: "Нұсқа 1",
-    version2: "Нұсқа 2",
-    title: "Жарықтықты салыстыру",
-    topText: "Сызықтарды саусақпен жылжытыңыз. Биіктік екеуіне бірге өзгереді.",
-    bottomText: "Қараңғырақ сызық қызыл түспен белгіленеді",
-    openCamera: "Камераны ашу",
-    scan10: "10 секунд сканерлеу",
-    uploadImage: "Сурет жүктеу",
-    menu: "Мәзір",
-    simpleText: "Жай мәтін",
-    loginDemo: "Бұл әзірге демо терезе. Кейін мұнда авторизация жасауға болады.",
-    name: "Аты",
-    password: "Құпиясөз",
-    enter: "Кіру",
-    cameraClosed: "Камера ашылмаған",
-    liveMode: "Тікелей режим",
-    scanReady: "Камераны бекітіп, сканерлеуді басыңыз",
-    positionChanged: "Орын өзгерді. Сканерлеуді қайта бастаңыз",
-    cameraError: "Камераны ашу қатесі",
-    imageLoaded: "Сурет жүктелді",
-    noData: "Дерек жоқ",
-    sameBrightness: "Жарықтық бірдей",
-    leftBrighter: value => `Сол жақ ${value}% жарығырақ`,
-    rightBrighter: value => `Оң жақ ${value}% жарығырақ`,
-    scanning: value => `Сканерлеу: ${value} сек`,
-    spotReady: "Дақты саусақпен қоршаңыз",
-    drawingSpot: "Есептеу үшін саусақты жіберіңіз",
-    spotTooSmall: "Аймақ тым кішкентай",
-    spotIntensity: value => `Концентрация: ${value} мг/мл`
-  },
-
-  en: {
-    login: "Login",
-    guest: "Guest",
-    version1: "Version 1",
-    version2: "Version 2",
-    title: "Brightness comparison",
-    topText: "Move the lines with your finger. Height changes for both at once.",
-    bottomText: "The darker line is highlighted in red",
-    openCamera: "Open camera",
-    scan10: "Scan for 10 seconds",
-    uploadImage: "Upload image",
-    menu: "Menu",
-    simpleText: "Simple text",
-    loginDemo: "This is a demo window for now. Authorization can be added here later.",
-    name: "Name",
-    password: "Password",
-    enter: "Log in",
-    cameraClosed: "Camera is not open",
-    liveMode: "Live mode",
-    scanReady: "Hold the camera still and press scan",
-    positionChanged: "Position changed. Start scanning again",
-    cameraError: "Camera opening error",
-    imageLoaded: "Image loaded",
-    noData: "No data",
-    sameBrightness: "Brightness is the same",
-    leftBrighter: value => `Left is brighter by ${value}%`,
-    rightBrighter: value => `Right is brighter by ${value}%`,
-    scanning: value => `Scanning: ${value} sec`,
-    spotReady: "Circle the spot with your finger",
-    drawingSpot: "Release to calculate",
-    spotTooSmall: "Area is too small",
-    spotIntensity: value => `Concentration: ${value} mg/ml`
+startBtn.onclick=async e=>{
+  e.stopPropagation();
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+    video.srcObject=stream;
+    video.onloadedmetadata=()=>{
+      video.play();
+      cameraStarted=true;
+      imageLoaded=false;
+      activeSource='camera';
+      photoImage.style.display='none';
+      photoImage.removeAttribute('src');
+      startBtn.style.display='none';
+      currentPoints=[];
+      finalSpotResult=null;
+      result.textContent=t('spotReady');
+    };
+  }catch(err){
+    result.textContent=t('cameraError');
+    alert(t('cameraError')+': '+err.message);
   }
 };
 
-let currentLang = "ru";
-
-let cameraStarted = false;
-let imageLoaded = false;
-let activeSource = null;
-let mode = "live";
-
-const lines = [
-  { x: 38 },
-  { x: 62 }
-];
-
-let lineY1 = 25;
-let lineY2 = 75;
-
-let activeLine = null;
-let resizingEdge = null;
-let isDraggingLine = false;
-
-const AVERAGE_TIME = 10000;
-
-let liveHistory = [];
-
-let isScanning = false;
-let scanStartTime = 0;
-let scanData = [];
-let finalScanResult = null;
-
-let isDrawingSpot = false;
-let spotPoints = [];
-let finalSpotResult = null;
-
-function t(key, value) {
-  const item = I18N[currentLang][key];
-
-  if (typeof item === "function") {
-    return item(value);
-  }
-
-  return item || key;
-}
-
-function applyLanguage() {
-  document.documentElement.lang = currentLang;
-
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    el.textContent = t(el.dataset.i18n);
-  });
-
-  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
-    el.placeholder = t(el.dataset.i18nPlaceholder);
-  });
-
-  if (
-    loginBtn.textContent === I18N.ru.guest ||
-    loginBtn.textContent === I18N.kk.guest ||
-    loginBtn.textContent === I18N.en.guest
-  ) {
-    loginBtn.textContent = t("guest");
-  }
-
-  if (!cameraStarted && !imageLoaded) {
-    result.textContent = t("cameraClosed");
-  } else if (mode === "live" && imageLoaded) {
-    result.textContent = t("imageLoaded");
-  } else if (mode === "live") {
-    result.textContent = t("liveMode");
-  } else if (mode === "scan" && finalSpotResult !== null) {
-    result.textContent = t("spotIntensity", finalSpotResult.toFixed(3));
-  } else if (mode === "scan") {
-    result.textContent = t("spotReady");
-  } else if (finalScanResult) {
-    result.textContent = formatResult(finalScanResult, 2);
-  }
-}
-
-function hasSource() {
-  return cameraStarted || imageLoaded;
-}
-
-function openMenu() {
-  sideMenu.classList.add("open");
-  shade.classList.add("open");
-}
-
-function closeMenu() {
-  sideMenu.classList.remove("open");
-  shade.classList.remove("open");
-}
-
-function openLogin() {
-  loginModal.classList.add("open");
-}
-
-function closeLogin() {
-  loginModal.classList.remove("open");
-}
-
-menuBtn.addEventListener("click", openMenu);
-closeMenuBtn.addEventListener("click", closeMenu);
-shade.addEventListener("click", closeMenu);
-
-loginBtn.addEventListener("click", openLogin);
-closeLoginBtn.addEventListener("click", closeLogin);
-
-loginModal.addEventListener("click", e => {
-  if (e.target === loginModal) closeLogin();
-});
-
-fakeLoginBtn.addEventListener("click", () => {
-  loginBtn.textContent = t("guest");
-  closeLogin();
-});
-
-langBtn.addEventListener("click", e => {
-  e.stopPropagation();
-  langPanel.classList.toggle("open");
-});
-
-document.addEventListener("click", e => {
-  if (!e.target.closest(".lang-wrap")) {
-    langPanel.classList.remove("open");
-  }
-});
-
-langPanel.addEventListener("click", e => {
-  const btn = e.target.closest("[data-lang]");
-  if (!btn) return;
-
-  currentLang = btn.dataset.lang;
-  langPanel.classList.remove("open");
-  applyLanguage();
-});
-
-uploadBtn.addEventListener("click", e => {
-  e.stopPropagation();
-  imageInput.click();
-});
-
-imageInput.addEventListener("change", () => {
-  const file = imageInput.files[0];
-  if (!file) return;
-
-  const url = URL.createObjectURL(file);
-
-  photoImage.onload = () => {
+uploadBtn.onclick=e=>{e.stopPropagation();imageInput.click()};
+imageInput.onchange=()=>{
+  const file=imageInput.files[0];
+  if(!file)return;
+  const url=URL.createObjectURL(file);
+  photoImage.onload=()=>{
     URL.revokeObjectURL(url);
-
-    imageLoaded = true;
-    activeSource = "image";
-
-    photoImage.style.display = "block";
-    startBtn.style.display = "none";
-    scanBtn.style.display = "none";
-    uploadBtn.style.display = "block";
-
-    liveHistory = [];
-    scanData = [];
-    finalScanResult = null;
-    isScanning = false;
-    isDrawingSpot = false;
-    spotPoints = [];
-    finalSpotResult = null;
-
-    if (mode === "live") {
-      liveModeBtn.classList.remove("secondary");
-      scanModeBtn.classList.add("secondary");
-      result.textContent = t("imageLoaded");
-    } else {
-      liveModeBtn.classList.add("secondary");
-      scanModeBtn.classList.remove("secondary");
-      result.textContent = t("spotReady");
-    }
+    imageLoaded=true;
+    activeSource='image';
+    photoImage.style.display='block';
+    startBtn.style.display='none';
+    currentPoints=[];
+    finalSpotResult=null;
+    result.textContent=t('spotReady');
   };
+  photoImage.src=url;
+  imageInput.value='';
+};
 
-  photoImage.src = url;
-});
+function getPointerPercent(e){const r=cameraBox.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*100,y:(e.clientY-r.top)/r.height*100}}
+function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
+function distance(x1,y1,x2,y2){return Math.hypot(x1-x2,y1-y2)}
 
-liveModeBtn.addEventListener("click", () => {
-  mode = "live";
-  isScanning = false;
-  scanData = [];
-  finalScanResult = null;
-  liveHistory = [];
-  isDrawingSpot = false;
-  spotPoints = [];
-  finalSpotResult = null;
-
-  uploadBtn.style.display = "block";
-  scanBtn.style.display = "none";
-
-  liveModeBtn.classList.remove("secondary");
-  scanModeBtn.classList.add("secondary");
-
-  result.textContent = hasSource() ? t("liveMode") : t("cameraClosed");
-});
-
-scanModeBtn.addEventListener("click", () => {
-  mode = "scan";
-  isScanning = false;
-  scanData = [];
-  finalScanResult = null;
-  liveHistory = [];
-  isDrawingSpot = false;
-  spotPoints = [];
-  finalSpotResult = null;
-
-  uploadBtn.style.display = "block";
-  scanBtn.style.display = "none";
-
-  scanModeBtn.classList.remove("secondary");
-  liveModeBtn.classList.add("secondary");
-
-  result.textContent = hasSource() ? t("spotReady") : t("cameraClosed");
-});
-
-startBtn.addEventListener("click", async e => {
-  e.stopPropagation();
-
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: "environment" } },
-      audio: false
-    });
-
-    video.srcObject = stream;
-
-    video.onloadedmetadata = () => {
-      video.play();
-
-      cameraStarted = true;
-      imageLoaded = false;
-      activeSource = "camera";
-
-      photoImage.style.display = "none";
-      photoImage.removeAttribute("src");
-
-      startBtn.style.display = "none";
-      uploadBtn.style.display = "block";
-
-      scanBtn.style.display = "none";
-
-      result.textContent = mode === "live"
-        ? t("liveMode")
-        : t("spotReady");
-    };
-
-  } catch (err) {
-    result.textContent = t("cameraError");
-    alert(t("cameraError") + ": " + err.message);
-  }
-});
-
-scanBtn.addEventListener("click", e => {
-  e.stopPropagation();
-
-  if (!cameraStarted || isScanning) return;
-
-  scanData = [];
-  finalScanResult = null;
-  isScanning = true;
-  scanStartTime = performance.now();
-
-  result.textContent = t("scanning", "10.0");
-});
-
-cameraBox.addEventListener("pointerdown", e => {
-  if (e.target.closest("button")) return;
-
+cameraBox.addEventListener('pointerdown',e=>{
+  if(e.target.closest('button'))return;
   e.preventDefault();
-
-  const pos = getPointerPercent(e);
-
-  if (mode === "scan") {
-    if (!hasSource()) return;
-
-    isDrawingSpot = true;
-    spotPoints = [pos];
-    finalSpotResult = null;
-    cameraBox.setPointerCapture(e.pointerId);
-    result.textContent = t("drawingSpot");
-    return;
-  }
-  const visual = getVisualLines();
-
-  const HANDLE_RADIUS = 13;
-  const LINE_TOUCH_RADIUS = 26;
-
-  const leftTop = distance(pos.x, pos.y, visual.left.x, lineY1);
-  const leftBottom = distance(pos.x, pos.y, visual.left.x, lineY2);
-  const rightTop = distance(pos.x, pos.y, visual.right.x, lineY1);
-  const rightBottom = distance(pos.x, pos.y, visual.right.x, lineY2);
-
-  const nearestHandle = Math.min(leftTop, leftBottom, rightTop, rightBottom);
-
-  if (nearestHandle <= HANDLE_RADIUS) {
-    resizingEdge =
-      nearestHandle === leftTop || nearestHandle === rightTop
-        ? "top"
-        : "bottom";
-
-    activeLine = null;
-    isDraggingLine = true;
-    cameraBox.setPointerCapture(e.pointerId);
-    return;
-  }
-
-  const leftLineDistance = distanceToVerticalSegment(
-    pos.x,
-    pos.y,
-    visual.left.x,
-    lineY1,
-    lineY2
-  );
-
-  const rightLineDistance = distanceToVerticalSegment(
-    pos.x,
-    pos.y,
-    visual.right.x,
-    lineY1,
-    lineY2
-  );
-
-  if (Math.min(leftLineDistance, rightLineDistance) <= LINE_TOUCH_RADIUS) {
-    activeLine = leftLineDistance <= rightLineDistance
-      ? lines.indexOf(visual.left)
-      : lines.indexOf(visual.right);
-
-    resizingEdge = null;
-    isDraggingLine = true;
-    cameraBox.setPointerCapture(e.pointerId);
-    return;
-  }
-
-  activeLine = null;
-  resizingEdge = null;
-  isDraggingLine = false;
+  if(!hasSource())return;
+  const pos=getPointerPercent(e);
+  isDrawingSpot=true;
+  currentPoints=[pos];
+  finalSpotResult=null;
+  cameraBox.setPointerCapture(e.pointerId);
+  result.textContent=t('drawingSpot');
 });
 
-cameraBox.addEventListener("pointermove", e => {
-  if (mode === "scan") {
-    if (!isDrawingSpot) return;
-
-    e.preventDefault();
-    const pos = getPointerPercent(e);
-    const last = spotPoints[spotPoints.length - 1];
-
-    if (!last || distance(pos.x, pos.y, last.x, last.y) > 0.6) {
-      spotPoints.push(pos);
-    }
-
-    return;
-  }
-
-  if (activeLine === null && resizingEdge === null) return;
-
+cameraBox.addEventListener('pointermove',e=>{
+  if(!isDrawingSpot)return;
   e.preventDefault();
-
-  const pos = getPointerPercent(e);
-
-  if (resizingEdge === "top") {
-    lineY1 = clamp(pos.y, 5, lineY2 - 6);
-    return;
-  }
-
-  if (resizingEdge === "bottom") {
-    lineY2 = clamp(pos.y, lineY1 + 6, 95);
-    return;
-  }
-
-  if (activeLine !== null) {
-    lines[activeLine].x = clamp(pos.x, 6, 94);
-    return;
-  }
+  const pos=getPointerPercent(e);
+  const last=currentPoints[currentPoints.length-1];
+  if(!last||distance(pos.x,pos.y,last.x,last.y)>0.6)currentPoints.push(pos);
 });
 
-cameraBox.addEventListener("pointerup", stopDrag);
-cameraBox.addEventListener("pointercancel", stopDrag);
-cameraBox.addEventListener("lostpointercapture", stopDrag);
+cameraBox.addEventListener('pointerup',finishDrawing);
+cameraBox.addEventListener('pointercancel',finishDrawing);
+cameraBox.addEventListener('lostpointercapture',finishDrawing);
 
-function stopDrag(e) {
-  if (e) e.preventDefault();
-
-  if (mode === "scan") {
-    if (isDrawingSpot) {
-      isDrawingSpot = false;
-
-      if (spotPoints.length >= 3) {
-        finalSpotResult = getSpotIntensity(spotPoints);
-        result.textContent = finalSpotResult === null
-          ? t("spotTooSmall")
-          : t("spotIntensity", finalSpotResult.toFixed(3));
-      } else {
-        finalSpotResult = null;
-        result.textContent = t("spotTooSmall");
-      }
-    }
-
-    activeLine = null;
-    resizingEdge = null;
-    isDraggingLine = false;
+function finishDrawing(e){
+  if(e)e.preventDefault();
+  if(!isDrawingSpot)return;
+  isDrawingSpot=false;
+  if(currentPoints.length<3){
+    finalSpotResult=null;
+    result.textContent=t('spotTooSmall');
     return;
   }
+  finalSpotResult=measureSpotC(currentPoints);
+  result.textContent=finalSpotResult?formatSpotResult(finalSpotResult):t('spotTooSmall');
+}
 
-  activeLine = null;
-  resizingEdge = null;
-  isDraggingLine = false;
-
-  liveHistory = [];
-  scanData = [];
-  finalScanResult = null;
-  isScanning = false;
-
-  if (mode === "scan" && cameraStarted) {
-    result.textContent = t("positionChanged");
+function resizeCanvas(){
+  const box=cameraBox.getBoundingClientRect();
+  const pr=window.devicePixelRatio||1;
+  const cw=Math.round(box.width*pr);
+  const ch=Math.round(box.height*pr);
+  if(canvas.width!==cw||canvas.height!==ch){
+    canvas.width=cw;canvas.height=ch;
+    canvas.style.width=box.width+'px';canvas.style.height=box.height+'px';
   }
+  ctx.setTransform(pr,0,0,pr,0,0);
+  if(hiddenCanvas.width!==cw||hiddenCanvas.height!==ch){hiddenCanvas.width=cw;hiddenCanvas.height=ch}
 }
 
-function getPointerPercent(e) {
-  const rect = cameraBox.getBoundingClientRect();
-
-  return {
-    x: ((e.clientX - rect.left) / rect.width) * 100,
-    y: ((e.clientY - rect.top) / rect.height) * 100
-  };
+function drawSourceCover(src,sw0,sh0){
+  const tw=hiddenCanvas.width,th=hiddenCanvas.height,sr=sw0/sh0,tr=tw/th;
+  let sx=0,sy=0,sw=sw0,sh=sh0;
+  if(sr>tr){sw=sh0*tr;sx=(sw0-sw)/2}else{sh=sw0/tr;sy=(sh0-sh)/2}
+  hiddenCtx.clearRect(0,0,tw,th);
+  hiddenCtx.drawImage(src,sx,sy,sw,sh,0,0,tw,th);
 }
 
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
-
-function distance(x1, y1, x2, y2) {
-  return Math.hypot(x1 - x2, y1 - y2);
-}
-
-function distanceToVerticalSegment(px, py, lineX, y1, y2) {
-  const top = Math.min(y1, y2);
-  const bottom = Math.max(y1, y2);
-  const closestY = clamp(py, top, bottom);
-
-  return distance(px, py, lineX, closestY);
-}
-
-function resizeCanvas() {
-  const box = cameraBox.getBoundingClientRect();
-  const pixelRatio = window.devicePixelRatio || 1;
-
-  const canvasWidth = Math.round(box.width * pixelRatio);
-  const canvasHeight = Math.round(box.height * pixelRatio);
-
-  if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-
-    canvas.style.width = `${box.width}px`;
-    canvas.style.height = `${box.height}px`;
+function pointInPolygon(x,y,poly){
+  let inside=false;
+  for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+    const xi=poly[i].x,yi=poly[i].y,xj=poly[j].x,yj=poly[j].y;
+    const hit=(yi>y)!==(yj>y)&&x<((xj-xi)*(y-yi))/(yj-yi)+xi;
+    if(hit)inside=!inside;
   }
-
-  ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-
-  if (
-    hiddenCanvas.width !== canvasWidth ||
-    hiddenCanvas.height !== canvasHeight
-  ) {
-    hiddenCanvas.width = canvasWidth;
-    hiddenCanvas.height = canvasHeight;
-  }
-}
-
-function drawSourceCover(source, sourceWidth, sourceHeight) {
-  const targetWidth = hiddenCanvas.width;
-  const targetHeight = hiddenCanvas.height;
-
-  const sourceRatio = sourceWidth / sourceHeight;
-  const targetRatio = targetWidth / targetHeight;
-
-  let sx = 0;
-  let sy = 0;
-  let sw = sourceWidth;
-  let sh = sourceHeight;
-
-  if (sourceRatio > targetRatio) {
-    sw = sourceHeight * targetRatio;
-    sx = (sourceWidth - sw) / 2;
-  } else {
-    sh = sourceWidth / targetRatio;
-    sy = (sourceHeight - sh) / 2;
-  }
-
-  hiddenCtx.clearRect(0, 0, targetWidth, targetHeight);
-  hiddenCtx.drawImage(
-    source,
-    sx,
-    sy,
-    sw,
-    sh,
-    0,
-    0,
-    targetWidth,
-    targetHeight
-  );
-}
-
-function getVisualLines() {
-  const sorted = [...lines].sort((a, b) => a.x - b.x);
-
-  return {
-    left: sorted[0],
-    right: sorted[1]
-  };
-}
-
-function getLineSample(line) {
-  const w = hiddenCanvas.width;
-  const h = hiddenCanvas.height;
-
-  const x = clamp(Math.round(line.x / 100 * w), 0, w - 1);
-  const y1 = lineY1 / 100 * h;
-  const y2 = lineY2 / 100 * h;
-
-  const steps = 120;
-
-  let totalBrightness = 0;
-
-  for (let i = 0; i < steps; i++) {
-    const t = i / (steps - 1);
-    const y = clamp(Math.round(y1 + (y2 - y1) * t), 0, h - 1);
-
-    const pixel = hiddenCtx.getImageData(x, y, 1, 1).data;
-
-    totalBrightness +=
-      0.299 * pixel[0] +
-      0.587 * pixel[1] +
-      0.114 * pixel[2];
-  }
-
-  return {
-    brightness: totalBrightness / steps
-  };
-}
-
-function addLiveAverage(left, right) {
-  const now = performance.now();
-
-  liveHistory.push({ time: now, left, right });
-
-  while (liveHistory.length && now - liveHistory[0].time > AVERAGE_TIME) {
-    liveHistory.shift();
-  }
-}
-
-function getAverage(data) {
-  if (!data.length) return null;
-
-  let left = 0;
-  let right = 0;
-
-  for (const item of data) {
-    left += item.left;
-    right += item.right;
-  }
-
-  return {
-    left: left / data.length,
-    right: right / data.length
-  };
-}
-
-function formatResult(avg, digits) {
-  if (!avg) return t("noData");
-
-  const max = Math.max(avg.left, avg.right);
-  const min = Math.min(avg.left, avg.right);
-
-  const percent = min > 0 ? ((max - min) / min) * 100 : 0;
-  const value = percent.toFixed(digits);
-
-  if (avg.left > avg.right) {
-    return t("leftBrighter", value);
-  }
-
-  if (avg.right > avg.left) {
-    return t("rightBrighter", value);
-  }
-
-  return t("sameBrightness");
-}
-
-function pointInPolygon(x, y, polygon) {
-  let inside = false;
-
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i].x;
-    const yi = polygon[i].y;
-    const xj = polygon[j].x;
-    const yj = polygon[j].y;
-
-    const intersect =
-      yi > y !== yj > y &&
-      x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
-
-    if (intersect) inside = !inside;
-  }
-
   return inside;
 }
 
-function getSpotIntensity(points) {
-  const w = hiddenCanvas.width;
-  const h = hiddenCanvas.height;
-
-  const polygon = points.map(p => ({
-    x: p.x / 100 * w,
-    y: p.y / 100 * h
-  }));
-
-  const minX = clamp(Math.floor(Math.min(...polygon.map(p => p.x))), 0, w - 1);
-  const maxX = clamp(Math.ceil(Math.max(...polygon.map(p => p.x))), 0, w - 1);
-  const minY = clamp(Math.floor(Math.min(...polygon.map(p => p.y))), 0, h - 1);
-  const maxY = clamp(Math.ceil(Math.max(...polygon.map(p => p.y))), 0, h - 1);
-
-  const imageData = hiddenCtx.getImageData(0, 0, w, h);
-  const data = imageData.data;
-
-  let sum = 0;
-  let count = 0;
-
-  for (let y = minY; y <= maxY; y++) {
-    for (let x = minX; x <= maxX; x++) {
-      if (!pointInPolygon(x, y, polygon)) continue;
-
-      const i = (y * w + x) * 4;
-      const R = data[i];
-      const G = data[i + 1];
-
-      // x = R - G
-      // C (мг/мл) = 3.7029 * x - 0.3421
-      const xValue = R - G;
-      const concentration = 3.7029 * xValue - 0.3421;
-
-      sum += concentration;
+function measureSpotC(points){
+  const w=hiddenCanvas.width,h=hiddenCanvas.height;
+  const poly=points.map(p=>({x:p.x/100*w,y:p.y/100*h}));
+  const minX=clamp(Math.floor(Math.min(...poly.map(p=>p.x))),0,w-1);
+  const maxX=clamp(Math.ceil(Math.max(...poly.map(p=>p.x))),0,w-1);
+  const minY=clamp(Math.floor(Math.min(...poly.map(p=>p.y))),0,h-1);
+  const maxY=clamp(Math.ceil(Math.max(...poly.map(p=>p.y))),0,h-1);
+  const img=hiddenCtx.getImageData(0,0,w,h).data;
+  let redSum=0,greenSum=0,count=0;
+  for(let y=minY;y<=maxY;y++){
+    for(let x=minX;x<=maxX;x++){
+      if(!pointInPolygon(x,y,poly))continue;
+      const i=(y*w+x)*4;
+      redSum+=img[i];
+      greenSum+=img[i+1];
       count++;
     }
   }
-
-  if (count < 10) return null;
-
-  return sum / count;
+  if(count<10)return null;
+  const x=(redSum/count)-(greenSum/count);
+  const c=0.2684*x+0.1426;
+  return {c};
 }
 
-function drawSpotPolygon(points, isFinal) {
-  if (!points.length) return;
+function formatSpotResult(r){return `C: ${r.c.toFixed(3)} мг/мл`}
 
-  const box = cameraBox.getBoundingClientRect();
-
-  ctx.lineWidth = isFinal ? 4 : 3;
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
-  ctx.strokeStyle = isFinal
-    ? "rgba(0, 255, 150, 0.9)"
-    : "rgba(255, 255, 255, 0.9)";
-  ctx.fillStyle = isFinal
-    ? "rgba(0, 255, 150, 0.16)"
-    : "rgba(255, 255, 255, 0.10)";
-
+function drawSpotPolygon(points,closed){
+  if(!points.length)return;
+  const box=cameraBox.getBoundingClientRect();
+  ctx.lineWidth=closed?4:3;
+  ctx.lineCap='round';
+  ctx.lineJoin='round';
+  ctx.strokeStyle=closed?'rgba(0,255,150,.9)':'rgba(255,255,255,.9)';
+  ctx.fillStyle=closed?'rgba(0,255,150,.16)':'rgba(255,255,255,.10)';
   ctx.beginPath();
-  ctx.moveTo(points[0].x / 100 * box.width, points[0].y / 100 * box.height);
-
-  for (let i = 1; i < points.length; i++) {
-    ctx.lineTo(points[i].x / 100 * box.width, points[i].y / 100 * box.height);
-  }
-
-  if (isFinal) ctx.closePath();
+  ctx.moveTo(points[0].x/100*box.width,points[0].y/100*box.height);
+  for(let i=1;i<points.length;i++)ctx.lineTo(points[i].x/100*box.width,points[i].y/100*box.height);
+  if(closed)ctx.closePath();
   ctx.fill();
   ctx.stroke();
 }
 
-function drawLine(line, isDarker) {
-  const box = cameraBox.getBoundingClientRect();
-
-  const x = line.x / 100 * box.width;
-  const y1 = lineY1 / 100 * box.height;
-  const y2 = lineY2 / 100 * box.height;
-
-  ctx.lineWidth = 7;
-  ctx.lineCap = "round";
-
-  ctx.strokeStyle = isDarker
-    ? "rgba(255, 70, 70, 0.55)"
-    : "rgba(0, 255, 150, 0.42)";
-
-  ctx.beginPath();
-  ctx.moveTo(x, y1);
-  ctx.lineTo(x, y2);
-  ctx.stroke();
-
-  ctx.fillStyle = "rgba(255,255,255,0.45)";
-
-  ctx.beginPath();
-  ctx.arc(x, y1, 8, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.arc(x, y2, 8, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-function loop() {
-  if (!hasSource()) {
-    requestAnimationFrame(loop);
-    return;
-  }
-
-  let sourceReady = false;
-
-  if (activeSource === "camera") {
-    sourceReady = video.videoWidth && video.videoHeight;
-  }
-
-  if (activeSource === "image") {
-    sourceReady = photoImage.naturalWidth && photoImage.naturalHeight;
-  }
-
-  if (sourceReady) {
+function loop(){
+  if(!hasSource()){requestAnimationFrame(loop);return}
+  let ready=false;
+  if(activeSource==='camera')ready=video.videoWidth&&video.videoHeight;
+  if(activeSource==='image')ready=photoImage.naturalWidth&&photoImage.naturalHeight;
+  if(ready){
     resizeCanvas();
-
-    if (activeSource === "camera") {
-      drawSourceCover(video, video.videoWidth, video.videoHeight);
-    }
-
-    if (activeSource === "image") {
-      drawSourceCover(photoImage, photoImage.naturalWidth, photoImage.naturalHeight);
-    }
-
-    const box = cameraBox.getBoundingClientRect();
-    ctx.clearRect(0, 0, box.width, box.height);
-
-    if (mode === "scan") {
-      drawSpotPolygon(spotPoints, !isDrawingSpot && spotPoints.length >= 3);
-
-      if (!isDrawingSpot && finalSpotResult !== null) {
-        result.textContent = t("spotIntensity", finalSpotResult.toFixed(3));
-      } else if (!isDrawingSpot && hasSource() && finalSpotResult === null && !spotPoints.length) {
-        result.textContent = t("spotReady");
-      }
-
-      requestAnimationFrame(loop);
-      return;
-    }
-
-    const visual = getVisualLines();
-
-    const leftSample = getLineSample(visual.left);
-    const rightSample = getLineSample(visual.right);
-
-    const leftNow = leftSample.brightness;
-    const rightNow = rightSample.brightness;
-
-    let drawAverage = {
-      left: leftNow,
-      right: rightNow
-    };
-
-    if (mode === "live") {
-      if (activeSource === "image") {
-        drawAverage = {
-          left: leftNow,
-          right: rightNow
-        };
-
-        if (!isDraggingLine) {
-          result.textContent = formatResult(drawAverage, 1);
-        }
-      }
-
-      if (activeSource === "camera") {
-        addLiveAverage(leftNow, rightNow);
-
-        const avg = getAverage(liveHistory);
-        drawAverage = avg || drawAverage;
-
-        result.textContent = formatResult(avg, 1);
-      }
-    }
-
-    if (mode === "scan") {
-      if (isScanning) {
-        const now = performance.now();
-        const elapsed = now - scanStartTime;
-        const remaining = Math.max(0, (AVERAGE_TIME - elapsed) / 1000);
-
-        scanData.push({
-          left: leftNow,
-          right: rightNow
-        });
-
-        result.textContent = t("scanning", remaining.toFixed(1));
-
-        if (elapsed >= AVERAGE_TIME) {
-          isScanning = false;
-          finalScanResult = getAverage(scanData);
-          result.textContent = formatResult(finalScanResult, 2);
-        }
-
-        drawAverage = getAverage(scanData) || drawAverage;
-      } else if (finalScanResult) {
-        drawAverage = finalScanResult;
-      }
-    }
-
-    drawLine(visual.left, drawAverage.left < drawAverage.right);
-    drawLine(visual.right, drawAverage.right < drawAverage.left);
+    if(activeSource==='camera')drawSourceCover(video,video.videoWidth,video.videoHeight);
+    else drawSourceCover(photoImage,photoImage.naturalWidth,photoImage.naturalHeight);
+    const box=cameraBox.getBoundingClientRect();
+    ctx.clearRect(0,0,box.width,box.height);
+    drawSpotPolygon(currentPoints,!isDrawingSpot&&currentPoints.length>=3);
+    if(finalSpotResult&&!isDrawingSpot)result.textContent=formatSpotResult(finalSpotResult);
+    else if(!isDrawingSpot&&!currentPoints.length)result.textContent=t('spotReady');
   }
-
   requestAnimationFrame(loop);
 }
 
 applyLanguage();
 loop();
 </script>
-
 </body>
 </html>
