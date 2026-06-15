@@ -827,7 +827,7 @@ const I18N = {
     spotReady: "Обведите пятно пальцем",
     drawingSpot: "Отпустите палец, чтобы посчитать",
     spotTooSmall: "Область слишком маленькая",
-    spotIntensity: value => `Интенсивность: ${value}%`
+    spotIntensity: value => `Концентрация: ${value} мг/мл`
   },
 
   kk: {
@@ -861,7 +861,7 @@ const I18N = {
     spotReady: "Дақты саусақпен қоршаңыз",
     drawingSpot: "Есептеу үшін саусақты жіберіңіз",
     spotTooSmall: "Аймақ тым кішкентай",
-    spotIntensity: value => `Қарқындылық: ${value}%`
+    spotIntensity: value => `Концентрация: ${value} мг/мл`
   },
 
   en: {
@@ -895,7 +895,7 @@ const I18N = {
     spotReady: "Circle the spot with your finger",
     drawingSpot: "Release to calculate",
     spotTooSmall: "Area is too small",
-    spotIntensity: value => `Intensity: ${value}%`
+    spotIntensity: value => `Concentration: ${value} mg/ml`
   }
 };
 
@@ -967,7 +967,7 @@ function applyLanguage() {
   } else if (mode === "live") {
     result.textContent = t("liveMode");
   } else if (mode === "scan" && finalSpotResult !== null) {
-    result.textContent = t("spotIntensity", finalSpotResult.toFixed(1));
+    result.textContent = t("spotIntensity", finalSpotResult.toFixed(3));
   } else if (mode === "scan") {
     result.textContent = t("spotReady");
   } else if (finalScanResult) {
@@ -1290,7 +1290,7 @@ function stopDrag(e) {
         finalSpotResult = getSpotIntensity(spotPoints);
         result.textContent = finalSpotResult === null
           ? t("spotTooSmall")
-          : t("spotIntensity", finalSpotResult.toFixed(1));
+          : t("spotIntensity", finalSpotResult.toFixed(3));
       } else {
         finalSpotResult = null;
         result.textContent = t("spotTooSmall");
@@ -1533,14 +1533,13 @@ function getSpotIntensity(points) {
       const i = (y * w + x) * 4;
       const R = data[i];
       const G = data[i + 1];
-      const B = data[i + 2];
 
-      // Сигнал розово-фиолетового пятна на синем фоне.
-      // 0% = синий/тёмный фон, 100% = сильный розово-фиолетовый сигнал.
-      const raw = (R - G) * 0.75 + (R - B) * 0.25;
-      const pink = clamp((raw / 180) * 100, 0, 100);
+      // x = R - G
+      // C (мг/мл) = 3.7029 * x - 0.3421
+      const xValue = R - G;
+      const concentration = 3.7029 * xValue - 0.3421;
 
-      sum += pink;
+      sum += concentration;
       count++;
     }
   }
@@ -1641,7 +1640,7 @@ function loop() {
       drawSpotPolygon(spotPoints, !isDrawingSpot && spotPoints.length >= 3);
 
       if (!isDrawingSpot && finalSpotResult !== null) {
-        result.textContent = t("spotIntensity", finalSpotResult.toFixed(1));
+        result.textContent = t("spotIntensity", finalSpotResult.toFixed(3));
       } else if (!isDrawingSpot && hasSource() && finalSpotResult === null && !spotPoints.length) {
         result.textContent = t("spotReady");
       }
