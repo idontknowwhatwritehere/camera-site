@@ -69,7 +69,7 @@ video,canvas,#photoImage{position:absolute;inset:0;width:100%;height:100%;object
   <div class="footer">
     <button id="uploadBtn" class="upload-footer-btn" data-i18n="uploadImage">Загрузить изображение</button>
     <div class="result" id="result" data-i18n="cameraClosed">Камера не открыта</div>
-    <div class="bottom-text" id="bottomText" data-i18n="bottom">Концентрация в мг/мл</div>
+    <div class="bottom-text" id="bottomText" data-i18n="bottom">Концентрация в нг/мл</div>
   </div>
 </div></div>
 
@@ -121,8 +121,8 @@ const hiddenCanvas=document.createElement('canvas');
 const hiddenCtx=hiddenCanvas.getContext('2d',{willReadFrequently:true});
 
 const I18N={
-  ru:{login:'Вход',guest:'Гость',title:'Концентрация',hint:'Откройте камеру или загрузите изображение. Обведите пятно.',openCamera:'Открыть камеру',uploadImage:'Загрузить изображение',menu:'Меню',loginDemo:'Это демо-окно. Авторизацию можно добавить позже.',name:'Имя',password:'Пароль',enter:'Войти',cameraClosed:'Камера не открыта',imageLoaded:'Изображение загружено',spotReady:'Обведите пятно',drawingSpot:'Замкните контур',spotTooSmall:'Область слишком маленькая',bottom:'Концентрация в мг/мл',cameraError:'Ошибка камеры'},
-  kk:{login:'Кіру',guest:'Қонақ',title:'Концентрация',hint:'Камераны ашыңыз немесе сурет жүктеңіз. Дақты қоршаңыз.',openCamera:'Камераны ашу',uploadImage:'Сурет жүктеу',menu:'Мәзір',loginDemo:'Бұл демо терезе. Авторизацияны кейін қосуға болады.',name:'Аты',password:'Құпиясөз',enter:'Кіру',cameraClosed:'Камера ашылмаған',imageLoaded:'Сурет жүктелді',spotReady:'Дақты қоршаңыз',drawingSpot:'Контурды жабыңыз',spotTooSmall:'Аймақ тым кішкентай',bottom:'Концентрация мг/мл',cameraError:'Камера қатесі'},
+  ru:{login:'Вход',guest:'Гость',title:'Концентрация',hint:'Откройте камеру или загрузите изображение. Обведите пятно.',openCamera:'Открыть камеру',uploadImage:'Загрузить изображение',menu:'Меню',loginDemo:'Это демо-окно. Авторизацию можно добавить позже.',name:'Имя',password:'Пароль',enter:'Войти',cameraClosed:'Камера не открыта',imageLoaded:'Изображение загружено',spotReady:'Обведите пятно',drawingSpot:'Замкните контур',spotTooSmall:'Область слишком маленькая',bottom:'Концентрация в нг/мл',cameraError:'Ошибка камеры'},
+  kk:{login:'Кіру',guest:'Қонақ',title:'Концентрация',hint:'Камераны ашыңыз немесе сурет жүктеңіз. Дақты қоршаңыз.',openCamera:'Камераны ашу',uploadImage:'Сурет жүктеу',menu:'Мәзір',loginDemo:'Бұл демо терезе. Авторизацияны кейін қосуға болады.',name:'Аты',password:'Құпиясөз',enter:'Кіру',cameraClosed:'Камера ашылмаған',imageLoaded:'Сурет жүктелді',spotReady:'Дақты қоршаңыз',drawingSpot:'Контурды жабыңыз',spotTooSmall:'Аймақ тым кішкентай',bottom:'Концентрация нг/мл',cameraError:'Камера қатесі'},
   en:{login:'Login',guest:'Guest',title:'Concentration',hint:'Open the camera or upload an image. Circle the spot.',openCamera:'Open camera',uploadImage:'Upload image',menu:'Menu',loginDemo:'This is a demo window. Authorization can be added later.',name:'Name',password:'Password',enter:'Log in',cameraClosed:'Camera is not open',imageLoaded:'Image loaded',spotReady:'Circle the spot',drawingSpot:'Close the contour',spotTooSmall:'Area is too small',bottom:'Concentration in mg/ml',cameraError:'Camera error'}
 };
 
@@ -295,7 +295,7 @@ function measureSpotC(points){
   return {c};
 }
 
-function formatSpotResult(r){return `C: ${r.c.toFixed(3)} мг/мл`}
+function formatSpotResult(r){return `C: ${r.c.toFixed(3)} нг/мл`}
 
 function drawSpotPolygon(points,closed){
   if(!points.length)return;
