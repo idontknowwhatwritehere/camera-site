@@ -37,23 +37,22 @@ video,canvas,#photoImage{position:absolute;inset:0;width:100%;height:100%;object
 .login-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:40}.login-modal.open{opacity:1;pointer-events:auto}.login-card{position:relative;width:100%;max-width:330px;padding:22px;border-radius:24px;background:rgba(22,22,22,.96);border:1px solid rgba(255,255,255,.12);box-shadow:0 20px 60px rgba(0,0,0,.55);text-align:center}.login-card h2{margin:0 0 8px;font-size:24px}.login-card p{margin:0 0 16px;color:#aaa;font-size:13px;line-height:1.35}.login-card input{width:100%;height:44px;margin-bottom:10px;padding:0 14px;border:0;border-radius:14px;background:rgba(255,255,255,.1);color:#fff;font-size:15px;outline:0}.login-card input::placeholder{color:#888}#fakeLoginBtn{width:100%;height:44px;margin-top:4px}.close-login{position:absolute;right:12px;top:12px;width:32px;height:32px;padding:0;border-radius:12px;background:rgba(255,255,255,.12);color:#fff;font-size:22px}
 @media(max-height:610px){.top-text,.bottom-text{display:none}.header,.footer{gap:3px}h1{font-size:clamp(18px,5vw,24px)}.result{min-height:32px}}
 @media(max-height:540px){.app{padding:calc(env(safe-area-inset-top) + 4px) 8px calc(env(safe-area-inset-bottom) + 5px)}.content{gap:4px}.header{gap:4px}.footer{gap:2px}.top-text,.bottom-text,h1{display:none}.top-bar,.login-btn,.upload-footer-btn{height:30px}.icon-btn{width:30px;height:30px;min-width:30px;border-radius:10px;font-size:17px}.login-btn{min-width:72px;font-size:13px;padding:0 12px}.camera-box{border-radius:16px}.result{min-height:30px;max-height:50px;font-size:clamp(18px,5vw,24px)}}
-.collection-control{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;color:#ccc;width:100%}.collection-control select{max-width:180px;background:#222;color:#fff;border:1px solid #555;border-radius:8px;padding:6px;font:inherit}.reference-status{font-size:11px;line-height:1.3;text-align:center;color:#bbb;min-height:14px}.result.result-within{color:#59e39c}.result.result-outside{color:#ff7777}.reference-help{font-size:10px;line-height:1.3;color:#aaa;text-align:center;max-width:100%}.reference-help p{margin:6px 0}.reference-help a{color:#bce6ff}.reference-help summary{cursor:pointer}.footer{overflow-y:auto;max-height:48dvh}.reference-help[open]{max-height:100px;overflow:auto}.reference-help a:focus-visible,.collection-control select:focus-visible{outline:2px solid #fff;outline-offset:2px}</style>
+.collection-control{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;color:#ccc;width:100%}.collection-control select{max-width:180px;background:#222;color:#fff;border:1px solid #555;border-radius:8px;padding:6px;font:inherit}.reference-status{font-size:11px;line-height:1.3;text-align:center;color:#bbb;min-height:14px}.result.result-within{color:#59e39c}.result.result-outside{color:#ff7777}.reference-help{font-size:10px;line-height:1.3;color:#aaa;text-align:center;max-width:100%}.reference-help p{margin:6px 0}.reference-help a{color:#bce6ff}.reference-help summary{cursor:pointer}.footer{overflow-y:auto;max-height:48dvh}.reference-help[open]{max-height:100px;overflow:auto}.reference-help a:focus-visible,.collection-control select:focus-visible{outline:2px solid #fff;outline-offset:2px}.main-site-link{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px;border-radius:14px;background:rgba(255,255,255,.08);color:#fff;text-decoration:none;font-size:15px;line-height:1.5}.main-site-link:hover{background:rgba(0,208,132,.16)}.main-site-link:focus-visible,#menuBtn:focus-visible,#langBtn:focus-visible{outline:2px solid #7fddc7;outline-offset:3px}</style>
 </head>
 <body>
 <div class="app"><div class="content">
   <div class="header">
     <div class="top-bar">
-      <button class="icon-btn" id="menuBtn">☰</button>
+      <button class="icon-btn" id="menuBtn" aria-label="Меню" aria-controls="sideMenu" aria-expanded="false">⋮</button>
       <div class="top-actions">
         <div class="lang-wrap">
-          <button class="icon-btn" id="langBtn">🌐</button>
+          <button class="icon-btn" id="langBtn" aria-label="Сменить язык">🌐</button>
           <div class="lang-panel" id="langPanel">
             <button data-lang="ru">Русский</button>
             <button data-lang="kk">Қазақша</button>
             <button data-lang="en">English</button>
           </div>
         </div>
-        <button class="login-btn" id="loginBtn" data-i18n="login">Вход</button>
       </div>
     </div>
     <h1 data-i18n="title">Концентрация</h1>
@@ -79,26 +78,16 @@ video,canvas,#photoImage{position:absolute;inset:0;width:100%;height:100%;object
 <div class="side-menu" id="sideMenu">
   <div class="side-menu-header">
     <div><strong data-i18n="menu">Меню</strong></div>
-    <button id="closeMenuBtn">×</button>
+    <button id="closeMenuBtn" aria-label="Закрыть меню">×</button>
   </div>
-</div>
-
-<div class="login-modal" id="loginModal">
-  <div class="login-card">
-    <button class="close-login" id="closeLoginBtn">×</button>
-    <h2 data-i18n="login">Вход</h2>
-    <p data-i18n="loginDemo">Это демо-окно. Авторизацию можно добавить позже.</p>
-    <input type="text" data-i18n-placeholder="name" placeholder="Имя">
-    <input type="password" data-i18n-placeholder="password" placeholder="Пароль">
-    <button id="fakeLoginBtn" data-i18n="enter">Войти</button>
-  </div>
+  <a class="main-site-link" href="https://idontknowwhatwritehere.github.io/cortisol-site/" target="_blank" rel="noopener noreferrer"><span data-i18n="mainSite">О проекте Rapid Cortisol</span><span aria-hidden="true">↗</span></a>
 </div>
 
 <script>
 function setAppHeight(){const h=window.visualViewport?window.visualViewport.height:window.innerHeight;document.documentElement.style.setProperty('--app-height',h+'px')}
 setAppHeight();window.addEventListener('resize',setAppHeight);window.addEventListener('orientationchange',setAppHeight);if(window.visualViewport){visualViewport.addEventListener('resize',setAppHeight);visualViewport.addEventListener('scroll',setAppHeight)}
 
-document.addEventListener('touchmove',e=>{if(e.target.closest('.login-card')||e.target.closest('.side-menu'))return;e.preventDefault()},{passive:false});
+document.addEventListener('touchmove',e=>{if(e.target.closest('.side-menu'))return;e.preventDefault()},{passive:false});
 
 const video=document.getElementById('video');
 const photoImage=document.getElementById('photoImage');
@@ -113,10 +102,6 @@ const menuBtn=document.getElementById('menuBtn');
 const closeMenuBtn=document.getElementById('closeMenuBtn');
 const sideMenu=document.getElementById('sideMenu');
 const shade=document.getElementById('shade');
-const loginBtn=document.getElementById('loginBtn');
-const loginModal=document.getElementById('loginModal');
-const closeLoginBtn=document.getElementById('closeLoginBtn');
-const fakeLoginBtn=document.getElementById('fakeLoginBtn');
 const langBtn=document.getElementById('langBtn');
 const langPanel=document.getElementById('langPanel');
 const hiddenCanvas=document.createElement('canvas');
@@ -131,6 +116,7 @@ const I18N={
 Object.assign(I18N.ru,{collectionTime:'Время сбора слюны',chooseTime:'Выберите время',referenceHelp:'О диапазонах',referenceDisclaimer:'Справочные диапазоны лабораторного метода не валидированы для этого приложения. Цвет не является диагнозом.',within:'В справочном диапазоне',outside:'Вне справочного диапазона',belowZero:'Расчёт ниже нуля: проверьте снимок и выделенную область.',selectTime:'Выберите время сбора для сравнения.'});
 Object.assign(I18N.en,{collectionTime:'Saliva collection time',chooseTime:'Select time',referenceHelp:'About ranges',referenceDisclaimer:'These laboratory reference ranges have not been validated for this app. Color is not a diagnosis.',within:'Within reference range',outside:'Outside reference range',belowZero:'Calculation below zero: check the image and selected area.',selectTime:'Select collection time to compare.'});
 Object.assign(I18N.kk,{collectionTime:'Сілекей жинау уақыты',chooseTime:'Уақытты таңдаңыз',referenceHelp:'Аралықтар туралы',referenceDisclaimer:'Зертханалық аралықтар бұл қолданба үшін тексерілмеген. Түс диагноз болып саналмайды.',within:'Анықтамалық аралықта',outside:'Анықтамалық аралықтан тыс',belowZero:'Есеп нөлден төмен: сурет пен таңдалған аймақты тексеріңіз.',selectTime:'Салыстыру үшін жинау уақытын таңдаңыз.'});
+Object.assign(I18N.ru,{mainSite:'О проекте Rapid Cortisol'});Object.assign(I18N.en,{mainSite:'About Rapid Cortisol'});Object.assign(I18N.kk,{mainSite:'Rapid Cortisol жобасы туралы'});
 let currentLang='ru';
 let cameraStarted=false;
 let imageLoaded=false;
@@ -168,19 +154,14 @@ function applyLanguage(){
   document.documentElement.lang=currentLang;
   document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.dataset.i18nPlaceholder));
-  if(['Гость','Қонақ','Guest'].includes(loginBtn.textContent))loginBtn.textContent=t('guest');
   if(!hasSource())setResultText(t('cameraClosed'));
   else if(finalSpotResult)setResultText(formatSpotResult(finalSpotResult));
   else setResultText(t('spotReady'));
 }
-function openMenu(){sideMenu.classList.add('open');shade.classList.add('open')}
-function closeMenu(){sideMenu.classList.remove('open');shade.classList.remove('open')}
-function openLogin(){loginModal.classList.add('open')}
-function closeLogin(){loginModal.classList.remove('open')}
+function openMenu(){sideMenu.classList.add('open');shade.classList.add('open');menuBtn.setAttribute('aria-expanded','true')}
+function closeMenu(){sideMenu.classList.remove('open');shade.classList.remove('open');menuBtn.setAttribute('aria-expanded','false')}
 
 menuBtn.onclick=openMenu;closeMenuBtn.onclick=closeMenu;shade.onclick=closeMenu;
-loginBtn.onclick=openLogin;closeLoginBtn.onclick=closeLogin;loginModal.onclick=e=>{if(e.target===loginModal)closeLogin()};
-fakeLoginBtn.onclick=()=>{loginBtn.textContent=t('guest');closeLogin()};
 langBtn.onclick=e=>{e.stopPropagation();langPanel.classList.toggle('open')};
 document.addEventListener('click',e=>{if(!e.target.closest('.lang-wrap'))langPanel.classList.remove('open')});
 langPanel.onclick=e=>{const b=e.target.closest('[data-lang]');if(!b)return;currentLang=b.dataset.lang;langPanel.classList.remove('open');applyLanguage()};
