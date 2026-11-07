@@ -35,7 +35,7 @@ video,canvas,#photoImage{position:absolute;inset:0;width:100%;height:100%;object
 .login-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:40}.login-modal.open{opacity:1;pointer-events:auto}.login-card{position:relative;width:100%;max-width:330px;padding:22px;border-radius:24px;background:rgba(22,22,22,.96);border:1px solid rgba(255,255,255,.12);box-shadow:0 20px 60px rgba(0,0,0,.55);text-align:center}.login-card h2{margin:0 0 8px;font-size:24px}.login-card p{margin:0 0 16px;color:#aaa;font-size:13px;line-height:1.35}.login-card input{width:100%;height:44px;margin-bottom:10px;padding:0 14px;border:0;border-radius:14px;background:rgba(255,255,255,.1);color:#fff;font-size:15px;outline:0}.login-card input::placeholder{color:#888}#fakeLoginBtn{width:100%;height:44px;margin-top:4px}.close-login{position:absolute;right:12px;top:12px;width:32px;height:32px;padding:0;border-radius:12px;background:rgba(255,255,255,.12);color:#fff;font-size:22px}
 @media(max-height:610px){.top-text,.bottom-text{display:none}.header,.footer{gap:3px}h1{font-size:clamp(18px,5vw,24px)}.result{min-height:32px}}
 @media(max-height:540px){.app{padding:calc(env(safe-area-inset-top) + 4px) 8px calc(env(safe-area-inset-bottom) + 5px)}.content{gap:4px}.header{gap:4px}.footer{gap:2px}.top-text,.bottom-text,h1{display:none}.top-bar,.login-btn,.upload-footer-btn{height:30px}.icon-btn{width:30px;height:30px;min-width:30px;border-radius:10px;font-size:17px}.login-btn{min-width:72px;font-size:13px;padding:0 12px}.camera-box{border-radius:16px}.result{min-height:30px;max-height:50px;font-size:clamp(18px,5vw,24px)}}
-</style>
+.collection-control{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;color:#ccc;width:100%}.collection-control select{max-width:180px;background:#222;color:#fff;border:1px solid #555;border-radius:8px;padding:6px;font:inherit}.reference-status{font-size:11px;line-height:1.3;text-align:center;color:#bbb;min-height:14px}.result.result-within{color:#59e39c}.result.result-outside{color:#ff7777}.reference-help{font-size:10px;line-height:1.3;color:#aaa;text-align:center;max-width:100%}.reference-help p{margin:6px 0}.reference-help a{color:#bce6ff}.reference-help summary{cursor:pointer}.footer{overflow-y:auto;max-height:48dvh}.reference-help[open]{max-height:100px;overflow:auto}.reference-help a:focus-visible,.collection-control select:focus-visible{outline:2px solid #fff;outline-offset:2px}</style>
 </head>
 <body>
 <div class="app"><div class="content">
@@ -69,7 +69,7 @@ video,canvas,#photoImage{position:absolute;inset:0;width:100%;height:100%;object
   <div class="footer">
     <button id="uploadBtn" class="upload-footer-btn" data-i18n="uploadImage">Загрузить изображение</button>
     <div class="result" id="result" data-i18n="cameraClosed">Камера не открыта</div>
-    <div class="bottom-text" id="bottomText" data-i18n="bottom">Концентрация в нг/мл</div>
+    <label class="collection-control"><span data-i18n="collectionTime">Время сбора слюны</span><select id="collectionTime"><option value="" data-i18n="chooseTime">Выберите время</option><option value="morning">07:00–09:00</option><option value="afternoon">15:00–17:00</option><option value="night">23:00–00:00</option></select></label><div id="referenceStatus" class="reference-status" role="status"></div><details class="reference-help"><summary data-i18n="referenceHelp">О диапазонах</summary><p data-i18n="referenceDisclaimer">Справочные диапазоны лабораторного метода не валидированы для этого приложения. Цвет не является диагнозом.</p><a href="https://www.mayocliniclabs.com/api/sitecore/testcatalog/TestCatalogSetupPDF?testid=84225" target="_blank" rel="noopener noreferrer">Mayo Clinic Laboratories · SALCT</a></details><div class="bottom-text" id="bottomText" data-i18n="bottom">Концентрация в нг/мл</div>
   </div>
 </div></div>
 
@@ -123,9 +123,12 @@ const hiddenCtx=hiddenCanvas.getContext('2d',{willReadFrequently:true});
 const I18N={
   ru:{login:'Вход',guest:'Гость',title:'Концентрация',hint:'Откройте камеру или загрузите изображение. Обведите пятно.',openCamera:'Открыть камеру',uploadImage:'Загрузить изображение',menu:'Меню',loginDemo:'Это демо-окно. Авторизацию можно добавить позже.',name:'Имя',password:'Пароль',enter:'Войти',cameraClosed:'Камера не открыта',imageLoaded:'Изображение загружено',spotReady:'Обведите пятно',drawingSpot:'Замкните контур',spotTooSmall:'Область слишком маленькая',bottom:'Концентрация в нг/мл',cameraError:'Ошибка камеры'},
   kk:{login:'Кіру',guest:'Қонақ',title:'Концентрация',hint:'Камераны ашыңыз немесе сурет жүктеңіз. Дақты қоршаңыз.',openCamera:'Камераны ашу',uploadImage:'Сурет жүктеу',menu:'Мәзір',loginDemo:'Бұл демо терезе. Авторизацияны кейін қосуға болады.',name:'Аты',password:'Құпиясөз',enter:'Кіру',cameraClosed:'Камера ашылмаған',imageLoaded:'Сурет жүктелді',spotReady:'Дақты қоршаңыз',drawingSpot:'Контурды жабыңыз',spotTooSmall:'Аймақ тым кішкентай',bottom:'Концентрация нг/мл',cameraError:'Камера қатесі'},
-  en:{login:'Login',guest:'Guest',title:'Concentration',hint:'Open the camera or upload an image. Circle the spot.',openCamera:'Open camera',uploadImage:'Upload image',menu:'Menu',loginDemo:'This is a demo window. Authorization can be added later.',name:'Name',password:'Password',enter:'Log in',cameraClosed:'Camera is not open',imageLoaded:'Image loaded',spotReady:'Circle the spot',drawingSpot:'Close the contour',spotTooSmall:'Area is too small',bottom:'Concentration in mg/ml',cameraError:'Camera error'}
+  en:{login:'Login',guest:'Guest',title:'Concentration',hint:'Open the camera or upload an image. Circle the spot.',openCamera:'Open camera',uploadImage:'Upload image',menu:'Menu',loginDemo:'This is a demo window. Authorization can be added later.',name:'Name',password:'Password',enter:'Log in',cameraClosed:'Camera is not open',imageLoaded:'Image loaded',spotReady:'Circle the spot',drawingSpot:'Close the contour',spotTooSmall:'Area is too small',bottom:'Concentration in ng/ml',cameraError:'Camera error'}
 };
 
+Object.assign(I18N.ru,{collectionTime:'Время сбора слюны',chooseTime:'Выберите время',referenceHelp:'О диапазонах',referenceDisclaimer:'Справочные диапазоны лабораторного метода не валидированы для этого приложения. Цвет не является диагнозом.',within:'В справочном диапазоне',outside:'Вне справочного диапазона',belowZero:'Расчёт ниже нуля: проверьте снимок и выделенную область.',selectTime:'Выберите время сбора для сравнения.'});
+Object.assign(I18N.en,{collectionTime:'Saliva collection time',chooseTime:'Select time',referenceHelp:'About ranges',referenceDisclaimer:'These laboratory reference ranges have not been validated for this app. Color is not a diagnosis.',within:'Within reference range',outside:'Outside reference range',belowZero:'Calculation below zero: check the image and selected area.',selectTime:'Select collection time to compare.'});
+Object.assign(I18N.kk,{collectionTime:'Сілекей жинау уақыты',chooseTime:'Уақытты таңдаңыз',referenceHelp:'Аралықтар туралы',referenceDisclaimer:'Зертханалық аралықтар бұл қолданба үшін тексерілмеген. Түс диагноз болып саналмайды.',within:'Анықтамалық аралықта',outside:'Анықтамалық аралықтан тыс',belowZero:'Есеп нөлден төмен: сурет пен таңдалған аймақты тексеріңіз.',selectTime:'Салыстыру үшін жинау уақытын таңдаңыз.'});
 let currentLang='ru';
 let cameraStarted=false;
 let imageLoaded=false;
@@ -134,6 +137,29 @@ let currentPoints=[];
 let finalSpotResult=null;
 let isDrawingSpot=false;
 
+
+const collectionTime=document.getElementById('collectionTime');
+const referenceStatus=document.getElementById('referenceStatus');
+const REFERENCE_RANGES={morning:{min:1,max:7.5,inclusive:true,label:'1–7.5 ng/ml'},afternoon:{min:0,max:4.01,inclusive:false,label:'<4.01 ng/ml'},night:{min:0,max:1,inclusive:false,label:'<1 ng/ml'}};
+function classifyResult(r,period){
+ if(!r||!Number.isFinite(r.c))return null;
+ if(r.rawC<0)return 'invalid';
+ const range=REFERENCE_RANGES[period];if(!range)return null;
+ return r.c>=range.min&&(range.inclusive?r.c<=range.max:r.c<range.max)?'within':'outside';
+}
+function updateReference(){
+ result.classList.remove('result-within','result-outside');
+ const r=finalSpotResult;
+ if(!r||isDrawingSpot){referenceStatus.textContent='';return;}
+ const classification=classifyResult(r,collectionTime.value);
+ if(classification==='invalid'){result.classList.add('result-outside');referenceStatus.textContent=t('belowZero');return;}
+ if(!classification){referenceStatus.textContent=t('selectTime');return;}
+ result.classList.add(classification==='within'?'result-within':'result-outside');
+ referenceStatus.textContent=t(classification)+' · '+REFERENCE_RANGES[collectionTime.value].label;
+}
+function setResultText(text){result.textContent=text;updateReference();}
+collectionTime.addEventListener('change',updateReference);
+
 function t(k){return I18N[currentLang][k]||k}
 function hasSource(){return cameraStarted||imageLoaded}
 function applyLanguage(){
@@ -141,9 +167,9 @@ function applyLanguage(){
   document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.dataset.i18nPlaceholder));
   if(['Гость','Қонақ','Guest'].includes(loginBtn.textContent))loginBtn.textContent=t('guest');
-  if(!hasSource())result.textContent=t('cameraClosed');
-  else if(finalSpotResult)result.textContent=formatSpotResult(finalSpotResult);
-  else result.textContent=t('spotReady');
+  if(!hasSource())setResultText(t('cameraClosed'));
+  else if(finalSpotResult)setResultText(formatSpotResult(finalSpotResult));
+  else setResultText(t('spotReady'));
 }
 function openMenu(){sideMenu.classList.add('open');shade.classList.add('open')}
 function closeMenu(){sideMenu.classList.remove('open');shade.classList.remove('open')}
@@ -172,10 +198,10 @@ startBtn.onclick=async e=>{
       startBtn.style.display='none';
       currentPoints=[];
       finalSpotResult=null;
-      result.textContent=t('spotReady');
+      setResultText(t('spotReady'));
     };
   }catch(err){
-    result.textContent=t('cameraError');
+    setResultText(t('cameraError'));
     alert(t('cameraError')+': '+err.message);
   }
 };
@@ -193,7 +219,7 @@ imageInput.onchange=()=>{
     startBtn.style.display='none';
     currentPoints=[];
     finalSpotResult=null;
-    result.textContent=t('spotReady');
+    setResultText(t('spotReady'));
   };
   photoImage.src=url;
   imageInput.value='';
@@ -212,7 +238,7 @@ cameraBox.addEventListener('pointerdown',e=>{
   currentPoints=[pos];
   finalSpotResult=null;
   cameraBox.setPointerCapture(e.pointerId);
-  result.textContent=t('drawingSpot');
+  setResultText(t('drawingSpot'));
 });
 
 cameraBox.addEventListener('pointermove',e=>{
@@ -233,11 +259,11 @@ function finishDrawing(e){
   isDrawingSpot=false;
   if(currentPoints.length<3){
     finalSpotResult=null;
-    result.textContent=t('spotTooSmall');
+    setResultText(t('spotTooSmall'));
     return;
   }
   finalSpotResult=measureSpotC(currentPoints);
-  result.textContent=finalSpotResult?formatSpotResult(finalSpotResult):t('spotTooSmall');
+  setResultText(finalSpotResult?formatSpotResult(finalSpotResult):t('spotTooSmall'));
 }
 
 function resizeCanvas(){
@@ -291,8 +317,9 @@ function measureSpotC(points){
   }
   if(count<10)return null;
   const x=(redSum/count)-(greenSum/count);
-  const c=0.2684*x+0.1426;
-  return {c};
+  const rawC=0.2684*x+0.1426;
+  if(!Number.isFinite(rawC))return null;
+  return {c:Math.max(0,rawC),rawC};
 }
 
 function formatSpotResult(r){return `C: ${r.c.toFixed(3)} нг/мл`}
@@ -325,8 +352,8 @@ function loop(){
     const box=cameraBox.getBoundingClientRect();
     ctx.clearRect(0,0,box.width,box.height);
     drawSpotPolygon(currentPoints,!isDrawingSpot&&currentPoints.length>=3);
-    if(finalSpotResult&&!isDrawingSpot)result.textContent=formatSpotResult(finalSpotResult);
-    else if(!isDrawingSpot&&!currentPoints.length)result.textContent=t('spotReady');
+    if(finalSpotResult&&!isDrawingSpot)setResultText(formatSpotResult(finalSpotResult));
+    else if(!isDrawingSpot&&!currentPoints.length)setResultText(t('spotReady'));
   }
   requestAnimationFrame(loop);
 }
